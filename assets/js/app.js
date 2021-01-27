@@ -1,21 +1,21 @@
-$(window).resize(function() {
+$(window).resize(function () {
     sizeLayerControl();
 });
 
-$(document).on("click", ".feature-row", function(e) {
+$(document).on("click", ".feature-row", function (e) {
     $(document).off("mouseout", ".feature-row", clearHighlight);
     sidebarClick(parseInt($(this).attr("id"), 10));
 });
 
 if (!("ontouchstart" in window)) {
-    $(document).on("mouseover", ".feature-row", function(e) {
+    $(document).on("mouseover", ".feature-row", function (e) {
         highlight.clearLayers().addLayer(L.circleMarker([$(this).attr("lat"), $(this).attr("lng")], highlightStyle));
     });
 }
 
 $(document).on("mouseout", ".feature-row", clearHighlight);
 
-$("#about-btn").click(function() {
+$("#about-btn").click(function () {
     $("#aboutModal").modal("show");
     $(".navbar-collapse.in").collapse("hide");
     return false;
@@ -24,7 +24,7 @@ $("#about-btn").click(function() {
 
 
 /*On evite de collapser le dropdown au click*/
-$('.dropdown-menu').on('click', function(event) {
+$('.dropdown-menu').on('click', function (event) {
     if (jQuery(window).height() > 700) {
         event.stopPropagation();
     }
@@ -223,20 +223,20 @@ function toggleSecteursLyc(item) {
     }
 }
 
-$('#colleges-txmention-btn, #colleges-secto-btn, #colleges-txreu-btn').click(function() {
+$('#colleges-txmention-btn, #colleges-secto-btn, #colleges-txreu-btn').click(function () {
     toggleSecteurs(this);
 });
 
-$('#colleges-btn, #lycees-eg-btn, #lycees-tech-btn, #lycees-eg-tech-btn, #lycees-poly-btn, #lycees-pro-btn').click(function() {
+$('#colleges-btn, #lycees-eg-btn, #lycees-tech-btn, #lycees-eg-tech-btn, #lycees-poly-btn, #lycees-pro-btn').click(function () {
     toggleLayer(this);
 });
 
-$('#lycees-secto-btn').click(function() {
+$('#lycees-secto-btn').click(function () {
     toggleSecteursLyc(this);
 });
 
 
-$("#nav-btn").click(function() {
+$("#nav-btn").click(function () {
     $(".navbar-collapse").collapse("toggle");
     return false;
 });
@@ -297,13 +297,13 @@ function getColorRes(d) {
 
     return d > 100 ? '#FFFFFF' :
         d >= 93 ? gradient[8] :
-        d >= 90 ? gradient[7] :
-        d >= 87 ? gradient[6] :
-        d >= 83 ? gradient[5] :
-        d >= 80 ? gradient[4] :
-        d >= 75 ? gradient[3] :
-        d >= 72 ? gradient[2] :
-        gradient[1];
+            d >= 90 ? gradient[7] :
+                d >= 87 ? gradient[6] :
+                    d >= 83 ? gradient[5] :
+                        d >= 80 ? gradient[4] :
+                            d >= 75 ? gradient[3] :
+                                d >= 72 ? gradient[2] :
+                                    gradient[1];
 }
 
 function getColorMention(d) {
@@ -312,21 +312,21 @@ function getColorMention(d) {
 
     return d > 100 ? '#FFFFFF' :
         d >= 70 ? gradient[8] :
-        d >= 62 ? gradient[7] :
-        d >= 56 ? gradient[6] :
-        d >= 53 ? gradient[5] :
-        d >= 47 ? gradient[4] :
-        d >= 40 ? gradient[3] :
-        d >= 37 ? gradient[2] :
-        gradient[1];
+            d >= 62 ? gradient[7] :
+                d >= 56 ? gradient[6] :
+                    d >= 53 ? gradient[5] :
+                        d >= 47 ? gradient[4] :
+                            d >= 40 ? gradient[3] :
+                                d >= 37 ? gradient[2] :
+                                    gradient[1];
 }
 
 function getColorLycee(zone) {
     return zone == "ouest" ? '#b3de69' : //Vert
         zone == "est" ? '#80b1d3' : //Bleu
-        zone == "nord" ? '#fb8072' : //Rouge
-        zone == "sud" ? '#ffed6f' : //Jaune
-        '#FFFFB2';
+            zone == "nord" ? '#fb8072' : //Rouge
+                zone == "sud" ? '#ffed6f' : //Jaune
+                    '#FFFFB2';
 }
 
 var colorsSecto = ['#80b1d3', '#8dd3c7', '#b3de69', '#bc80bd', '#bebada', '#ccebc5', '#d9d9d9', '#fb8072', '#fccde5', '#fdb462', '#ffed6f', '#ffffb3'];
@@ -511,7 +511,7 @@ function onEachFeatureLyc(feature, layer) {
 
 /*Initialisation colleges_data dans colData (contient toutes les infos liées aux collèges : nom, tx reussite ...)*/
 var colData = {};
-$.getJSON("data/colleges_data.json", function(json) {
+$.getJSON("data/colleges_data.json", function (json) {
     colData = json;
 });
 
@@ -544,7 +544,7 @@ var recenter = L.easyButton({
     leafletClasses: true,
     states: [{
         icon: 'glyphicon glyphicon-resize-full',
-        onClick: function() {
+        onClick: function () {
             map.fitBounds([
                 [48.89, 2.413865],
                 [48.816353, 2.251302]
@@ -565,36 +565,36 @@ var resolution = L.easyButton({
     leafletClasses: true,
     position: 'topright',
     states: [{
-            stateName: 'sd',
-            icon: 'glyphicon glyphicon-hd-video',
-            onClick: function(btn, map) {
+        stateName: 'sd',
+        icon: 'glyphicon glyphicon-hd-video',
+        onClick: function (btn, map) {
 
-                if (map.hasLayer(colSecteurs)) {
-                    map.removeLayer(colSecteurs);
-                    colSecteurs = L.geoJson.ajax("data/secteurs_col.geojson", {
-                        style: style,
-                        onEachFeature: onEachFeature
-                    }).addTo(map);
-                    btn.state('hd');
-                }
-
+            if (map.hasLayer(colSecteurs)) {
+                map.removeLayer(colSecteurs);
+                colSecteurs = L.geoJson.ajax("data/secteurs_col.geojson", {
+                    style: style,
+                    onEachFeature: onEachFeature
+                }).addTo(map);
+                btn.state('hd');
             }
-        },
-        {
-            stateName: 'hd',
-            icon: 'glyphicon glyphicon-sd-video',
-            onClick: function(btn, map) {
-                if (map.hasLayer(colSecteurs)) {
-                    map.removeLayer(colSecteurs);
-                    colSecteurs = L.geoJson.ajax("data/secteurs_col_light.geojson", {
-                        style: style,
-                        onEachFeature: onEachFeature
-                    }).addTo(map);
-                    btn.state('sd');
-                }
 
-            }
         }
+    },
+    {
+        stateName: 'hd',
+        icon: 'glyphicon glyphicon-sd-video',
+        onClick: function (btn, map) {
+            if (map.hasLayer(colSecteurs)) {
+                map.removeLayer(colSecteurs);
+                colSecteurs = L.geoJson.ajax("data/secteurs_col_light.geojson", {
+                    style: style,
+                    onEachFeature: onEachFeature
+                }).addTo(map);
+                btn.state('sd');
+            }
+
+        }
+    }
     ]
 });
 resolution.addTo(map);
@@ -647,7 +647,7 @@ var locateControl = L.control.locate({
 /* Collèges */
 
 var colleges = new L.GeoJSON.AJAX("data/colleges.geojson", {
-    pointToLayer: function(feature, latlng) {
+    pointToLayer: function (feature, latlng) {
         //console.log(infoCol(colData[feature.properties['code' + i]]['nom'], colData[feature.properties['code' + i]]['adresse'], colData[feature.properties['code' + i]]['codepostal'], colData[feature.properties['code' + i]]['txreu'], colData[feature.properties['code' + i]]['txmention'], false));
         return L.marker(latlng, { icon: iconeBleue }).bindPopup(infoCol(colData[feature.properties['code']]['nom'], colData[feature.properties['code']]['adresse'], colData[feature.properties['code']]['codepostal'], colData[feature.properties['code']]['txreu'], colData[feature.properties['code']]['txmention'], false));
     }
@@ -655,7 +655,7 @@ var colleges = new L.GeoJSON.AJAX("data/colleges.geojson", {
 
 /* Lycées */
 var lycees = new L.GeoJSON.AJAX("data/lycees.geojson", {
-    pointToLayer: function(feature, latlng) {
+    pointToLayer: function (feature, latlng) {
         return L.marker(latlng, { icon: iconeRouge }).bindPopup(infoLyc(feature.properties.nom, feature.properties.adresse, feature.properties.cp, feature.properties.type));
     }
 });
@@ -663,50 +663,50 @@ var lycees = new L.GeoJSON.AJAX("data/lycees.geojson", {
 
 /* Lycées d'enseignement général*/
 var lycees_eg = new L.GeoJSON.AJAX("data/lycees.geojson", {
-    filter: function(feature, layer) {
+    filter: function (feature, layer) {
         return feature.properties.nature == 302;
     },
-    pointToLayer: function(feature, latlng) {
+    pointToLayer: function (feature, latlng) {
         return L.marker(latlng, { icon: iconeRouge }).bindPopup(infoLyc(feature.properties.nom, feature.properties.adresse, feature.properties.cp, feature.properties.type));
     }
 });
 
 /* Lycées d'enseignement technologique */
 var lycees_tech = new L.GeoJSON.AJAX("data/lycees.geojson", {
-    filter: function(feature, layer) {
+    filter: function (feature, layer) {
         return feature.properties.nature == 301;
     },
-    pointToLayer: function(feature, latlng) {
+    pointToLayer: function (feature, latlng) {
         return L.marker(latlng, { icon: iconeVert }).bindPopup(infoLyc(feature.properties.nom, feature.properties.adresse, feature.properties.cp, feature.properties.type));
     }
 });
 
 /* Lycées d'enseignement général et technologique*/
 var lycees_eg_tech = new L.GeoJSON.AJAX("data/lycees.geojson", {
-    filter: function(feature, layer) {
+    filter: function (feature, layer) {
         return feature.properties.nature == 300;
     },
-    pointToLayer: function(feature, latlng) {
+    pointToLayer: function (feature, latlng) {
         return L.marker(latlng, { icon: iconeOrange }).bindPopup(infoLyc(feature.properties.nom, feature.properties.adresse, feature.properties.cp, feature.properties.type));
     }
 });
 
 /* Lycées polyvalents*/
 var lycees_poly = new L.GeoJSON.AJAX("data/lycees.geojson", {
-    filter: function(feature, layer) {
+    filter: function (feature, layer) {
         return feature.properties.nature == 306;
     },
-    pointToLayer: function(feature, latlng) {
+    pointToLayer: function (feature, latlng) {
         return L.marker(latlng, { icon: iconeViolet }).bindPopup(infoLyc(feature.properties.nom, feature.properties.adresse, feature.properties.cp, feature.properties.type));
     }
 });
 
 /* Lycées professionnels*/
 var lycees_pro = new L.GeoJSON.AJAX("data/lycees.geojson", {
-    filter: function(feature, layer) {
+    filter: function (feature, layer) {
         return feature.properties.nature == 320;
     },
-    pointToLayer: function(feature, latlng) {
+    pointToLayer: function (feature, latlng) {
         return L.marker(latlng, { icon: iconeJaune }).bindPopup(infoLyc(feature.properties.nom, feature.properties.adresse, feature.properties.cp, feature.properties.type));
     }
 });
@@ -751,10 +751,10 @@ var path = {};
 var depart = {};
 var arrivee = {};
 
-$(function() {
+$(function () {
 
     $("#searchbox").autocomplete({
-        source: function(request, response) {
+        source: function (request, response) {
             $.ajax({
                 url: "https://api-adresse.data.gouv.fr/search/",
                 dataType: "json",
@@ -762,17 +762,21 @@ $(function() {
                     'q': request.term + ' Paris',
                     'limit': 5
                 },
-                success: function(data) {
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Accept', 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8');
+                    xhr.setRequestHeader('access-control-allow-origin', '*');
+                },
+                success: function (data) {
 
-                    
-                    $.each(data.features, function(key, value) {
+
+                    $.each(data.features, function (key, value) {
                         this.properties.lon = value.geometry.coordinates[0];
                         this.properties.lat = value.geometry.coordinates[1];
                         this.properties.label = value.properties.label;
                     });
 
-                  
-                    var arr = $.map(data.features, function(key, value) {
+
+                    var arr = $.map(data.features, function (key, value) {
                         return key.properties;
                     });
 
@@ -782,7 +786,7 @@ $(function() {
             });
         },
         minLength: 3,
-        select: function(event, ui) {
+        select: function (event, ui) {
 
             if (typeof markerLocation !== 'undefined') {
                 map.removeLayer(markerLocation);
@@ -861,9 +865,9 @@ $(function() {
 
 
                     // Recuperation du chemin à pied 
-                    $.getJSON(base + 'start='+ depart.lon + "," + depart.lat + '&end=' + arrivee.lon + "," + arrivee.lat, function(response) {
+                    $.getJSON(base + 'start=' + depart.lon + "," + depart.lat + '&end=' + arrivee.lon + "," + arrivee.lat, function (response) {
 
-                        
+
                         var lngLat = response.features[0].geometry.coordinates;
                         var latLng = [];
 
@@ -871,10 +875,10 @@ $(function() {
 
                         for (var i = 0; i < lngLat.length; i++) {
 
-                          var oldCoordinate = lngLat [i];
-                          var newCoordinate = [oldCoordinate [1], oldCoordinate[0]];
+                            var oldCoordinate = lngLat[i];
+                            var newCoordinate = [oldCoordinate[1], oldCoordinate[0]];
 
-                          latLng.push(newCoordinate);
+                            latLng.push(newCoordinate);
 
                         };
 
@@ -923,10 +927,10 @@ $(function() {
 
 
         },
-        open: function() {
+        open: function () {
             $(this).removeClass("ui-corner-all").addClass("ui-corner-top");
         },
-        close: function() {
+        close: function () {
             $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
         }
     });
@@ -940,19 +944,19 @@ function sizeLayerControl() {
 }
 
 /* Highlight search box text on click */
-$("#searchbox").click(function() {
+$("#searchbox").click(function () {
     $(this).select();
 });
 
 /* Prevent hitting enter from refreshing the page */
-$("#searchbox").keypress(function(e) {
+$("#searchbox").keypress(function (e) {
     if (e.which == 13) {
         e.preventDefault();
     }
 });
 
 
-$("#featureModal").on("hidden.bs.modal", function(e) {
+$("#featureModal").on("hidden.bs.modal", function (e) {
     $(document).on("mouseout", ".feature-row", clearHighlight);
 });
 
