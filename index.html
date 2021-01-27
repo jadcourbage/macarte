@@ -1,137 +1,168 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://opengraphprotocol.org/schema/" xmlns:fb="http://www.facebook.com/2008/fbml" lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#000000">
-    <meta name="keywords" content="carte scolaire, collèges Paris, lycées Paris, carte,sectorisation, résultats brevet" />
-    <meta name="description" content="Carte scolaire interactive permettant de visualiser les secteurs scolaires ainsi que l'emplacement des différents collèges et lycées de Paris. Recherche de la sectorisation par adresse. Résultats et taux de mention au brevet des collèges.">
-    <meta name="author" content="">
-    <meta property="og:url" content="http://www.cartescolaire.paris"/>
-    <meta property="og:title" content="Carte scolaire des collèges et lycées de Paris"/>
-    <meta property="og:image" content="http://www.cartescolaire.paris/school-250.png"/>
-    <meta property="og:site_name" content="cartescolaire.paris"/>
-    <meta property="og:description" content="Carte interactive permettant de visualiser les secteurs scolaires ainsi que la localisation des différents collèges et lycées de Paris. Recherche de la sectorisation par adresse. Résultats et taux de mention au brevet des collèges"/>
-    <meta property="fb:app_id" content="240245409647776" />
-    <title>Sectorisation - Carte scolaire interactive des collèges et lycées de Paris (2020-2021)</title>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://opengraphprotocol.org/schema/"
+  xmlns:fb="http://www.facebook.com/2008/fbml" lang="en">
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css">
-    <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.css">
-    <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.Default.css">
-    <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.css">
-    <link rel="stylesheet" href="assets/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.css">
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-    <link rel="stylesheet" href="assets/css/app.css">
- 
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#000000">
+  <meta name="keywords" content="carte scolaire, collèges Paris, lycées Paris, carte,sectorisation, résultats brevet" />
+  <meta name="description"
+    content="Carte scolaire interactive permettant de visualiser les secteurs scolaires ainsi que l'emplacement des différents collèges et lycées de Paris. Recherche de la sectorisation par adresse. Résultats et taux de mention au brevet des collèges.">
+  <meta name="author" content="">
+  <meta property="og:url" content="http://www.cartescolaire.paris" />
+  <meta property="og:title" content="Carte scolaire des collèges et lycées de Paris" />
+  <meta property="og:image" content="http://www.cartescolaire.paris/school-250.png" />
+  <meta property="og:site_name" content="cartescolaire.paris" />
+  <meta property="og:description"
+    content="Carte interactive permettant de visualiser les secteurs scolaires ainsi que la localisation des différents collèges et lycées de Paris. Recherche de la sectorisation par adresse. Résultats et taux de mention au brevet des collèges" />
+  <meta property="fb:app_id" content="240245409647776" />
+  <title>Sectorisation - Carte scolaire interactive des collèges et lycées de Paris (2020-2021)</title>
 
-    <link rel="apple-touch-icon" sizes="57x57" href="./apple-touch-icon-57x57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="./apple-touch-icon-60x60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="./apple-touch-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="./apple-touch-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="./apple-touch-icon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="./apple-touch-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="./apple-touch-icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="./apple-touch-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon-180x180.png">
-    <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32">
-    <link rel="icon" type="image/png" href="./android-chrome-192x192.png" sizes="192x192">
-    <link rel="icon" type="image/png" href="./favicon-96x96.png" sizes="96x96">
-    <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="msapplication-TileImage" content="/mstile-144x144.png">
-    <meta name="theme-color" content="#ffffff">
-    
-    <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css">
+  <link rel="stylesheet"
+    href="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.css">
+  <link rel="stylesheet"
+    href="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.Default.css">
+  <link rel="stylesheet"
+    href="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.css">
+  <link rel="stylesheet" href="assets/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.css">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+
+
+  <link rel="apple-touch-icon" sizes="57x57" href="./apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="./apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="./apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="./apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="./apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="./apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="./apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="./apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon-180x180.png">
+  <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="./android-chrome-192x192.png" sizes="192x192">
+  <link rel="icon" type="image/png" href="./favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  <script>
+    (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
     ga('create', 'UA-74616336-1', 'auto');
     ga('send', 'pageview');
-    </script>
+  </script>
 
-   </head>
+</head>
 
-  <body>
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <div class="navbar-icon-container">
-             <a href="#" class="navbar-icon pull-right visible-xs" id="nav-btn"><i class="fa fa-bars fa-lg white"></i></a>
-          </div>
-          <a class="navbar-brand" href="#" style="font-family:Century Gothic;font-size: 18px;">CarteScolaire.paris (2020-2021)</a>
-          </div>
-          <div class="navbar-collapse collapse">
-          <form class="navbar-form navbar-right" role="search">
-            <div class="form-group has-feedback">
-                <input id="searchbox" type="text" placeholder="Adresse ..." class="form-control">
-                <span id="searchicon" class="fa fa-search form-control-feedback"></span>
-            </div>
-            
-          </form>
-          <ul class="nav navbar-nav">
-              <li class="dropdown">
-              <a id="collegesDrop" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-graduation-cap"></i>&nbsp;&nbsp;Collèges <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="secteurs" id="colleges-secto-btn"><i class="fa fa-map-o"></i>&nbsp;&nbsp;Carte scolaire</a></li>
-                <li class="divider hidden-xs"></li>
-                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer" id="colleges-btn"><i class="fa fa-circle blue"></i>&nbsp;&nbsp;Collèges</a></li>
-                <li class="divider hidden-xs"></li>
-                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="secteurs" id="colleges-txreu-btn"><i class="fa fa-percent"></i>&nbsp;&nbsp;Taux de réussite au Brevet</a></li>
-                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="secteurs" id="colleges-txmention-btn"><i class="fa fa-percent"></i>&nbsp;&nbsp;Taux de mention au Brevet</a></li>
-              </ul>
-            </li>
-            <li class="dropdown">
-              <a id="lyceesDrop" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-university"></i>&nbsp;&nbsp;Lycées <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="secteursLyc" id="lycees-secto-btn"><i class="fa fa-map-o"></i></i>&nbsp;&nbsp;Carte scolaire</a></li>
-                <li class="divider hidden-xs"></li>
-                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer" id="lycees-eg-btn"><i class="fa fa-circle red"></i>&nbsp;&nbsp;Lycées d'enseignement général</a></li>
-                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer" id="lycees-tech-btn"><i class="fa fa-circle green"></i>&nbsp;&nbsp;Lycées d'enseignement technologique</a></li>
-                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer" id="lycees-eg-tech-btn"><i class="fa fa-circle orange"></i>&nbsp;&nbsp;Lycées d'enseignement général et technologique</a></li>
-                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer" id="lycees-poly-btn"><i class="fa fa-circle violet"></i>&nbsp;&nbsp;Lycées polyvalents</a></li>
-                <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer" id="lycees-pro-btn"><i class="fa fa-circle yellow"></i>&nbsp;&nbsp;Lycées professionels</a></li>
-              </ul>
-            </li>
-            <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="about-btn"><i class="fa fa-question-circle "></i>&nbsp;&nbsp;A propos</a></li>
-          </ul>
-
-          <ul class="nav navbar-nav nav-pills">
-            <li>
-            <a href="https://www.facebook.com/dialog/share?app_id=240245409647776&amp;display=popup&amp;href=http://www.cartescolaire.paris&amp;redirect_uri=http://www.cartescolaire.paris" title="Partager sur Facebook" target="_blank"  class="btn btn-social-icon btn-facebook white">
-            <i class="fa fa-facebook-official  white"></i>
-            </a>
-            </li>
-            <li>
-            <a href="https://plus.google.com/share?url=http://www.cartescolaire.paris" title="Partager sur Google+" target="_blank" class="btn btn-social-icon btn-google">
-            <i class="fa fa-google-plus  white"></i>
-            </a>
-            </li>
-            <li>
-            <a href="https://twitter.com/intent/tweet?text=Carte+scolaire+interactive&hashtags=cartescolaire&url=http://www.cartescolaire.paris" title="Partager sur Twitter" target="_blank" class="btn btn-social-icon btn-twitter">
-            <i class="fa fa-twitter white"></i>
-            </a>
-            </li>
-          </ul>
-        </div><!--/.navbar-collapse -->
-
+<body>
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <div class="navbar-icon-container">
+          <a href="#" class="navbar-icon pull-right visible-xs" id="nav-btn"><i class="fa fa-bars fa-lg white"></i></a>
+        </div>
+        <a class="navbar-brand" href="#" style="font-family:Century Gothic;font-size: 18px;">CarteScolaire.paris
+          (2020-2021)</a>
       </div>
-    </div>
+      <div class="navbar-collapse collapse">
+        <form class="navbar-form navbar-right" role="search">
+          <div class="form-group has-feedback">
+            <input id="searchbox" type="text" placeholder="Adresse ..." class="form-control">
+            <span id="searchicon" class="fa fa-search form-control-feedback"></span>
+          </div>
 
-    <div id="container">
-      <div id="map"></div>
-      <div id="results"/>
-    </div>
+        </form>
+        <ul class="nav navbar-nav">
+          <li class="dropdown">
+            <a id="collegesDrop" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i
+                class="fa fa-graduation-cap"></i>&nbsp;&nbsp;Collèges <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="secteurs"
+                  id="colleges-secto-btn"><i class="fa fa-map-o"></i>&nbsp;&nbsp;Carte scolaire</a></li>
+              <li class="divider hidden-xs"></li>
+              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer"
+                  id="colleges-btn"><i class="fa fa-circle blue"></i>&nbsp;&nbsp;Collèges</a></li>
+              <li class="divider hidden-xs"></li>
+              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="secteurs"
+                  id="colleges-txreu-btn"><i class="fa fa-percent"></i>&nbsp;&nbsp;Taux de réussite au Brevet</a></li>
+              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="secteurs"
+                  id="colleges-txmention-btn"><i class="fa fa-percent"></i>&nbsp;&nbsp;Taux de mention au Brevet</a>
+              </li>
+            </ul>
+          </li>
+          <li class="dropdown">
+            <a id="lyceesDrop" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i
+                class="fa fa-university"></i>&nbsp;&nbsp;Lycées <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="secteursLyc"
+                  id="lycees-secto-btn"><i class="fa fa-map-o"></i></i>&nbsp;&nbsp;Carte scolaire</a></li>
+              <li class="divider hidden-xs"></li>
+              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer"
+                  id="lycees-eg-btn"><i class="fa fa-circle red"></i>&nbsp;&nbsp;Lycées d'enseignement général</a></li>
+              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer"
+                  id="lycees-tech-btn"><i class="fa fa-circle green"></i>&nbsp;&nbsp;Lycées d'enseignement
+                  technologique</a></li>
+              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer"
+                  id="lycees-eg-tech-btn"><i class="fa fa-circle orange"></i>&nbsp;&nbsp;Lycées d'enseignement général
+                  et technologique</a></li>
+              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer"
+                  id="lycees-poly-btn"><i class="fa fa-circle violet"></i>&nbsp;&nbsp;Lycées polyvalents</a></li>
+              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer"
+                  id="lycees-pro-btn"><i class="fa fa-circle yellow"></i>&nbsp;&nbsp;Lycées professionels</a></li>
+            </ul>
+          </li>
+          <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="about-btn"><i
+                class="fa fa-question-circle "></i>&nbsp;&nbsp;A propos</a></li>
+        </ul>
 
-<!--     <div id="loading">
+        <ul class="nav navbar-nav nav-pills">
+          <li>
+            <a href="https://www.facebook.com/dialog/share?app_id=240245409647776&amp;display=popup&amp;href=http://www.cartescolaire.paris&amp;redirect_uri=http://www.cartescolaire.paris"
+              title="Partager sur Facebook" target="_blank" class="btn btn-social-icon btn-facebook white">
+              <i class="fa fa-facebook-official  white"></i>
+            </a>
+          </li>
+          <li>
+            <a href="https://plus.google.com/share?url=http://www.cartescolaire.paris" title="Partager sur Google+"
+              target="_blank" class="btn btn-social-icon btn-google">
+              <i class="fa fa-google-plus  white"></i>
+            </a>
+          </li>
+          <li>
+            <a href="https://twitter.com/intent/tweet?text=Carte+scolaire+interactive&hashtags=cartescolaire&url=http://www.cartescolaire.paris"
+              title="Partager sur Twitter" target="_blank" class="btn btn-social-icon btn-twitter">
+              <i class="fa fa-twitter white"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <!--/.navbar-collapse -->
+
+    </div>
+  </div>
+
+  <div id="container">
+    <div id="map"></div>
+    <div id="results" />
+  </div>
+
+  <!--     <div id="loading">
       <div class="loading-indicator">
         <div class="progress progress-striped active">
           <div class="progress-bar progress-bar-info progress-bar-full"></div>
@@ -139,83 +170,101 @@
       </div>
     </div> -->
 
-    <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
-          </div>
-          <div class="modal-body">
-            <ul class="nav nav-tabs nav-justified" id="aboutTabs">
-              <li class="active"><a href="#pres" data-toggle="tab"><i class="fa fa-question-circle"></i>&nbsp;Description</a></li>
-              <li><a href="#about" data-toggle="tab"><i class="fa fa-github"></i>&nbsp;Credits</a></li>
-              <li><a href="#data" data-toggle="tab"><i class="fa fa-globe"></i>&nbsp;Données</a></li>
-              <li><a href="#contact" data-toggle="tab"><i class="fa fa-envelope"></i>&nbsp;Contact</a></li>
-            </ul>
-            <div class="tab-content" id="aboutTabsContent">
-               <div class="tab-pane fade active in" id="pres">
-                <p><b>Carte interactive des collèges et lycées de Paris.</b> </br> </br> 
-                   Les menus <b>Collèges</b> et <b>Lycées</b> permettent de sélectionner une visualisation : </br> </br> 
-                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Liste et localisation des collèges et des lycées</br> 
-                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Carte scolaire / sectorisation des collèges et lycées</br> 
-                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Carte des résultats au Brevet des collèges</br> 
-                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Carte des taux de mention au Brevet des collèges.</br> </br> 
-                   Vous pouvez <b>superposer</b> les visualisations en sélectionnant plusieurs élements <br>
-                   (par exemple carte scolaire des collèges + lycées d'enseignement général et technologique)<br><br>
-                   Les <b>icônes</b> en bas en droite permettent de naviguer plus aisément dans la carte :<br><br>
-                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-location-arrow"></i>&nbsp;&nbsp;&nbsp;Géolocalisation<br>
-                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="glyphicon glyphicon-resize-full"></i>&nbsp;&nbsp;&nbsp;Vue globale de Paris<br>
-                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;Zoom avant<br>
-                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-minus"></i>&nbsp;&nbsp;&nbsp;Zoom arrière<br><br>
-                   Vous pouvez identifier le collège auquel vous êtes rattachés en tapant votre adresse dans le <b>moteur de recherche</b> &nbsp;&nbsp;<i class="fa fa-search"></i><br><br>
-                   La carte scolaire des collèges est affichée par défaut en basse définition &nbsp; <i class="glyphicon glyphicon-sd-video"></i>&nbsp; pour permettre un chargement plus rapide et une navigation plus fluide. Vous pouvez nénamoins afficher les secteurs avec <b>plus de précision</b> en cliquant sur le bouton &nbsp; <i class="glyphicon glyphicon-hd-video"></i>&nbsp; en haut à droite
+  <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
+        </div>
+        <div class="modal-body">
+          <ul class="nav nav-tabs nav-justified" id="aboutTabs">
+            <li class="active"><a href="#pres" data-toggle="tab"><i
+                  class="fa fa-question-circle"></i>&nbsp;Description</a></li>
+            <li><a href="#about" data-toggle="tab"><i class="fa fa-github"></i>&nbsp;Credits</a></li>
+            <li><a href="#data" data-toggle="tab"><i class="fa fa-globe"></i>&nbsp;Données</a></li>
+            <li><a href="#contact" data-toggle="tab"><i class="fa fa-envelope"></i>&nbsp;Contact</a></li>
+          </ul>
+          <div class="tab-content" id="aboutTabsContent">
+            <div class="tab-pane fade active in" id="pres">
+              <p><b>Carte interactive des collèges et lycées de Paris.</b> </br> </br>
+                Les menus <b>Collèges</b> et <b>Lycées</b> permettent de sélectionner une visualisation : </br> </br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Liste et localisation des collèges et des lycées</br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Carte scolaire / sectorisation des collèges et lycées</br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Carte des résultats au Brevet des collèges</br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Carte des taux de mention au Brevet des collèges.</br> </br>
+                Vous pouvez <b>superposer</b> les visualisations en sélectionnant plusieurs élements <br>
+                (par exemple carte scolaire des collèges + lycées d'enseignement général et technologique)<br><br>
+                Les <b>icônes</b> en bas en droite permettent de naviguer plus aisément dans la carte :<br><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i
+                  class="fa fa-location-arrow"></i>&nbsp;&nbsp;&nbsp;Géolocalisation<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="glyphicon glyphicon-resize-full"></i>&nbsp;&nbsp;&nbsp;Vue
+                globale de Paris<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;Zoom avant<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-minus"></i>&nbsp;&nbsp;&nbsp;Zoom arrière<br><br>
+                Vous pouvez identifier le collège auquel vous êtes rattachés en tapant votre adresse dans le <b>moteur
+                  de recherche</b> &nbsp;&nbsp;<i class="fa fa-search"></i><br><br>
+                La carte scolaire des collèges est affichée par défaut en basse définition &nbsp; <i
+                  class="glyphicon glyphicon-sd-video"></i>&nbsp; pour permettre un chargement plus rapide et une
+                navigation plus fluide. Vous pouvez nénamoins afficher les secteurs avec <b>plus de précision</b> en
+                cliquant sur le bouton &nbsp; <i class="glyphicon glyphicon-hd-video"></i>&nbsp; en haut à droite
 
-                   </p>
-              </div>              
-              <div class="tab-pane fade" id="about">
-                <div class="panel panel-primary">
-                  <ul class="list-group">
-                    <li class="list-group-item">Données cartographiques par &copy; les contributeurs d'<a href="https://www.openstreetmap.org" target="_blank">openstreetmap</a></li>
-                    <li class="list-group-item"><a href="http://leafletjs.com" target="_blank">Leaflet.js</a> : librairie de cartographie interactive </li>
-                    <li class="list-group-item"><a href="https://github.com/bmcbride/bootleaf" target="_blank">Bootleaf</a> : template Bootstrap pour Leaflet</li>
-                    <li class="list-group-item"><a href="hhttps://adresse.data.gouv.fr/api" target="_blank">adresse.data.gouv.fr</a> : API de géocodage des adresses françaises (données Base Adresse Nationale)</li>
-                    <li class="list-group-item"><a href="https://maps.openrouteservice.org" target="_blank">Openrouteservice</a> : API de calcul d'itinéraire piéton</li>
-                  </ul>
-                </div>
+              </p>
+            </div>
+            <div class="tab-pane fade" id="about">
+              <div class="panel panel-primary">
+                <ul class="list-group">
+                  <li class="list-group-item">Données cartographiques par &copy; les contributeurs d'<a
+                      href="https://www.openstreetmap.org" target="_blank">openstreetmap</a></li>
+                  <li class="list-group-item"><a href="https://leafletjs.com" target="_blank">Leaflet.js</a> : librairie
+                    de cartographie interactive </li>
+                  <li class="list-group-item"><a href="https://github.com/bmcbride/bootleaf"
+                      target="_blank">Bootleaf</a> : template Bootstrap pour Leaflet</li>
+                  <li class="list-group-item"><a href="https://adresse.data.gouv.fr/api"
+                      target="_blank">adresse.data.gouv.fr</a> : API de géocodage des adresses françaises (données Base
+                    Adresse Nationale)</li>
+                  <li class="list-group-item"><a href="https://maps.openrouteservice.org"
+                      target="_blank">Openrouteservice</a> : API de calcul d'itinéraire piéton</li>
+                </ul>
               </div>
-              <div class="tab-pane fade" id="data">
-                <div class="panel panel-primary">
-                  <ul class="list-group">
-                    <li class="list-group-item"><a href="http://www.data.gouv.fr/fr/datasets/adresse-et-geolocalisation-des-etablissements-denseignement-du-premier-et-second-degres/" target="_blank">data.gouv.fr </a> : Adresse et géolocalisation des établissements d'enseignement du premier et second degrés</li>
-                    <li class="list-group-item"><a href="https://opendata.paris.fr/explore/dataset/secteurs-scolaires-colleges/" target="_blank">opendata.paris.fr</a> : Secteurs scolaires Paris</li>
-                  </ul>
-                </div>
+            </div>
+            <div class="tab-pane fade" id="data">
+              <div class="panel panel-primary">
+                <ul class="list-group">
+                  <li class="list-group-item"><a
+                      href="https://www.data.gouv.fr/fr/datasets/adresse-et-geolocalisation-des-etablissements-denseignement-du-premier-et-second-degres/"
+                      target="_blank">data.gouv.fr </a> : Adresse et géolocalisation des établissements d'enseignement
+                    du premier et second degrés</li>
+                  <li class="list-group-item"><a
+                      href="https://opendata.paris.fr/explore/dataset/secteurs-scolaires-colleges/"
+                      target="_blank">opendata.paris.fr</a> : Secteurs scolaires Paris</li>
+                </ul>
               </div>
-              <div class="tab-pane fade" id="contact">
-                <p><b>Toute suggestion est la bienvenue !</b></p> </br>
-                <form id="contact-form" action="//formspree.io/f/contact@cartescolaire.paris" method="POST">
-                  <div class="well well-sm">
-                    <div class="row">
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label for="email">Email:</label>
-                          <input type="email" name="_replyto" class="form-control" id="email">
-                        </div>
-                      </div>
-                      <div class="col-md-8">
-                        <label for="message">Message:</label>
-                        <textarea name="message" class="form-control" rows="8" id="message"></textarea>
-                      </div>
-                      <div class="col-md-12">
-                        <p>
-                          <input type="hidden" name="_subject" value="Contact cartescolaire" />
-                          <input type="submit" value="Envoyer" class="btn btn-primary pull-right"></input>
-                        </p>
+            </div>
+            <div class="tab-pane fade" id="contact">
+              <p><b>Toute suggestion est la bienvenue !</b></p> </br>
+              <form id="contact-form" action="//formspree.io/f/contact@cartescolaire.paris" method="POST">
+                <div class="well well-sm">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" name="_replyto" class="form-control" id="email">
                       </div>
                     </div>
+                    <div class="col-md-8">
+                      <label for="message">Message:</label>
+                      <textarea name="message" class="form-control" rows="8" id="message"></textarea>
+                    </div>
+                    <div class="col-md-12">
+                      <p>
+                        <input type="hidden" name="_subject" value="Contact cartescolaire" />
+                        <input type="submit" value="Envoyer" class="btn btn-primary pull-right"></input>
+                      </p>
+                    </div>
                   </div>
-                </form>
-              </div>
+                </div>
+              </form>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
@@ -225,51 +274,55 @@
     </div><!-- /.modal -->
 
 
-    </div><!-- /.modal -->
+  </div><!-- /.modal -->
 
-    <div class="modal fade" id="featureModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title text-primary" id="feature-title"></h4>
-          </div>
-          <div class="modal-body" id="feature-info"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
-
-
+  <div class="modal fade" id="featureModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button class="close" type="button" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title text-primary" id="feature-title"></h4>
+        </div>
+        <div class="modal-body" id="feature-info"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
 
 
-    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.5/typeahead.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.3/handlebars.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.1.1/list.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
-    <script src="assets/js/leaflet.ajax.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-    <script src="assets/js/Leaflet.MakiMarkers.js"></script>
-    <script src="assets/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.js"></script>
-    <script src="assets/js/easy-button.js"></script>
-    <script src="assets/js/leaflet-pip.min.js"></script>
-    <script src="assets/js/leaflet-knn.min.js"></script>
-    <script src="assets/js/leaflet.geometryutil.js"></script>
-    <script src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js"></script>
-    <script src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.min.js"></script>
-    <script src="http://maps.stamen.com/js/tile.stamen.js?v1.3.0"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
-    <script src="assets/js/formspree.js"></script>
-    <script src="assets/js//Polyline.encoded.js"></script>
-    <script src="assets/js/gradient.js"></script>
-    <script src="assets/js/spin.min.js"></script>   
-    <script src="assets/js//leaflet.spin.js"></script>
-    <script src="assets/js/app.js"></script>    
-    <link rel="stylesheet" href="assets/css/ui-custom.css">
 
-  </body>
+
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.5/typeahead.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.3/handlebars.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.1.1/list.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
+  <script src="assets/js/leaflet.ajax.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <script src="assets/js/Leaflet.MakiMarkers.js"></script>
+  <script src="assets/leaflet-groupedlayercontrol/leaflet.groupedlayercontrol.js"></script>
+  <script src="assets/js/easy-button.js"></script>
+  <script src="assets/js/leaflet-pip.min.js"></script>
+  <script src="assets/js/leaflet-knn.min.js"></script>
+  <script src="assets/js/leaflet.geometryutil.js"></script>
+  <script
+    src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js"></script>
+  <script
+    src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.min.js"></script>
+  <script src="http://maps.stamen.com/js/tile.stamen.js?v1.3.0"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
+  <script src="assets/js/formspree.js"></script>
+  <script src="assets/js//Polyline.encoded.js"></script>
+  <script src="assets/js/gradient.js"></script>
+  <script src="assets/js/spin.min.js"></script>
+  <script src="assets/js//leaflet.spin.js"></script>
+  <script src="assets/js/app.js"></script>
+  <link rel="stylesheet" href="assets/css/ui-custom.css">
+
+</body>
+
 </html>
