@@ -867,7 +867,7 @@ $(function () {
                             xhr.setRequestHeader('access-control-allow-origin', '*');
                         },
                         dataType: "json",
-                        url: base + 'start=' + depart.lon + "," + depart.lat + '&end=' + arrivee.lon + "," + arrivee.lat,
+                        url: base + 'start=' + depart.lon + "," + depart.lat + '&end=' + arrivee.lon + "," + arrivee.lat,,
                         success: function (response) {
 
                             var lngLat = response.features[0].geometry.coordinates;
@@ -915,8 +915,7 @@ $(function () {
                             layerList.push(pathToSchool[id]);
 
 
-                        }
-                    });
+                        });
 
                 }
 
