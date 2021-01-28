@@ -819,8 +819,6 @@ $(function () {
             var lonMin = ui.item.lon;
             var lonMax = ui.item.lon;
 
-
-
             if (closestLayer.length > 0) { //Si le secteur est trouvé
 
                 //console.log(ui.item);
@@ -861,55 +859,63 @@ $(function () {
 
 
                     // Recuperation du chemin à pied 
-                    $.getJSON(base + 'start=' + depart.lon + "," + depart.lat + '&end=' + arrivee.lon + "," + arrivee.lat, function (response) {
+                    //$.getJSON(base + 'start=' + depart.lon + "," + depart.lat + '&end=' + arrivee.lon + "," + arrivee.lat, function (response) {
+
+                    $.ajax({
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader('Accept', 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8');
+                            xhr.setRequestHeader('access-control-allow-origin', '*');
+                        },
+                        dataType: "json",
+                        url: base + 'start=' + depart.lon + "," + depart.lat + '&end=' + arrivee.lon + "," + arrivee.lat,,
+                        success: function (response) {
+
+                            var lngLat = response.features[0].geometry.coordinates;
+                            var latLng = [];
+
+                            // Switch coordinates
+
+                            for (var i = 0; i < lngLat.length; i++) {
+
+                                var oldCoordinate = lngLat[i];
+                                var newCoordinate = [oldCoordinate[1], oldCoordinate[0]];
+
+                                latLng.push(newCoordinate);
+
+                            };
 
 
-                        var lngLat = response.features[0].geometry.coordinates;
-                        var latLng = [];
+                            pathToSchool[id] = L.polyline(latLng, {
+                                color: 'red',
+                                dashArray: '5,10'
+                            });
 
-                        // Switch coordinates
+                            var polyline = L.polyline(response.features[0].geometry.coordinates).addTo(map);
 
-                        for (var i = 0; i < lngLat.length; i++) {
+                            path.shape = pathToSchool[id];
+                            path.time = response.features[0].properties.summary.duration;
+                            path.length = response.features[0].properties.summary.distance;
 
-                            var oldCoordinate = lngLat[i];
-                            var newCoordinate = [oldCoordinate[1], oldCoordinate[0]];
-
-                            latLng.push(newCoordinate);
-
-                        };
+                            var time = Math.round(path.time / 60);
+                            var length = Math.round(path.length);
 
 
-                        pathToSchool[id] = L.polyline(latLng, {
-                            color: 'red',
-                            dashArray: '5,10'
+                            markerCollege[id] = L.marker(collegeLocation[id], { icon: iconeCollege });
+                            map.addLayer(markerCollege[id]);
+                            layerList.push(markerCollege[id]);
+
+                            popupCollege[id] = L.popup()
+                                .setLatLng(collegeLocation[id])
+                                .setContent(infoColPath(colData[closestLayer[0].feature.properties['code' + id]]['nom'], colData[closestLayer[0].feature.properties['code' + id]]['adresse'], colData[closestLayer[0].feature.properties['code' + id]]['codepostal'], colData[closestLayer[0].feature.properties['code' + id]]['txreu'], colData[closestLayer[0].feature.properties['code' + id]]['txmention'], false, time, length));
+
+                            map.addLayer(popupCollege[id]);
+                            layerList.push(popupCollege[id]);
+
+                            map.addLayer(pathToSchool[id]);
+                            layerList.push(pathToSchool[id]);
+
+
                         });
-
-                        var polyline = L.polyline(response.features[0].geometry.coordinates).addTo(map);
-
-                        path.shape = pathToSchool[id];
-                        path.time = response.features[0].properties.summary.duration;
-                        path.length = response.features[0].properties.summary.distance;
-
-                        var time = Math.round(path.time / 60);
-                        var length = Math.round(path.length);
-
-
-                        markerCollege[id] = L.marker(collegeLocation[id], { icon: iconeCollege });
-                        map.addLayer(markerCollege[id]);
-                        layerList.push(markerCollege[id]);
-
-                        popupCollege[id] = L.popup()
-                            .setLatLng(collegeLocation[id])
-                            .setContent(infoColPath(colData[closestLayer[0].feature.properties['code' + id]]['nom'], colData[closestLayer[0].feature.properties['code' + id]]['adresse'], colData[closestLayer[0].feature.properties['code' + id]]['codepostal'], colData[closestLayer[0].feature.properties['code' + id]]['txreu'], colData[closestLayer[0].feature.properties['code' + id]]['txmention'], false, time, length));
-
-                        map.addLayer(popupCollege[id]);
-                        layerList.push(popupCollege[id]);
-
-                        map.addLayer(pathToSchool[id]);
-                        layerList.push(pathToSchool[id]);
-
-
-                    });
 
                 }
 
