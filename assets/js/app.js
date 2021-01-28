@@ -762,6 +762,10 @@ $(function () {
                     'q': request.term + ' Paris',
                     'limit': 5
                 },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Accept', 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8');
+                    xhr.setRequestHeader('access-control-allow-origin', '*');
+                },
                 success: function (data) {
 
 
