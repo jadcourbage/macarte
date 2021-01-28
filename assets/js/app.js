@@ -862,10 +862,6 @@ $(function () {
                     //$.getJSON(base + 'start=' + depart.lon + "," + depart.lat + '&end=' + arrivee.lon + "," + arrivee.lat, function (response) {
 
                     $.ajax({
-                        beforeSend: function (xhr) {
-                            xhr.setRequestHeader('Accept', 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8');
-                            xhr.setRequestHeader('access-control-allow-origin', '*');
-                        },
                         dataType: "json",
                         url: base + 'start=' + depart.lon + "," + depart.lat + '&end=' + arrivee.lon + "," + arrivee.lat,
                         success: function (response) {
