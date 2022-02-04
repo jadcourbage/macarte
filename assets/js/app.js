@@ -254,7 +254,7 @@ function infoCol(nom, adresse, codepostal, txreu, txmention) {
         adresse + '<br/> ' + codepostal + ' PARIS <br/>' +
         '<b>Taux de r&eacute;ussite* : </b>' + ((txreu == 999) ? "N/A" : txreu + '%') + '<br/>' +
         '<b>Taux de mentions* : </b>' + ((txmention == 999) ? "N/A" : txmention + '%') + '<br/>' +
-        '*2018';
+        '*2020';
 }
 
 /* Génère le contenu HTML avec les infos sur un collège et la distance à l'adresse définie*/
@@ -265,7 +265,7 @@ function infoColPath(nom, adresse, codepostal, txreu, txmention, lycee, time, di
         adresse + '<br/> ' + codepostal + ' PARIS <br/>' +
         '<b>Taux de r&eacute;ussite* : </b>' + ((txreu == 999) ? "N/A" : txreu + '%') + '<br/>' +
         '<b>Taux de mentions* : </b>' + ((txmention == 999) ? "N/A" : txmention + '%') + '<br/>' +
-        '*2018';
+        '*2020';
 }
 
 
