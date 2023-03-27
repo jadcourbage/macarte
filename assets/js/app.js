@@ -279,48 +279,6 @@ function infoLyc(nom, adresse, codepostal, type) {
 }
 
 
-/* Gradient de couleurs en fonction du tx de réussite*/
-
-var gradient = [];
-gradient[1] = '#D7E8F9';
-gradient[2] = '#B8C6E9';
-gradient[3] = '#99A5D9';
-gradient[4] = '#7A84C9';
-gradient[5] = '#5C63BA';
-gradient[6] = '#3D42AA';
-gradient[7] = '#1E219A';
-gradient[8] = '#00008B';
-
-function getColorRes(d) {
-
-    d = parseFloat(d);
-
-    return d > 100 ? '#FFFFFF' :
-        d >= 93 ? gradient[8] :
-            d >= 90 ? gradient[7] :
-                d >= 87 ? gradient[6] :
-                    d >= 83 ? gradient[5] :
-                        d >= 80 ? gradient[4] :
-                            d >= 75 ? gradient[3] :
-                                d >= 72 ? gradient[2] :
-                                    gradient[1];
-}
-
-function getColorMention(d) {
-
-    d = parseFloat(d);
-
-    return d > 100 ? '#FFFFFF' :
-        d >= 70 ? gradient[8] :
-            d >= 62 ? gradient[7] :
-                d >= 56 ? gradient[6] :
-                    d >= 53 ? gradient[5] :
-                        d >= 47 ? gradient[4] :
-                            d >= 40 ? gradient[3] :
-                                d >= 37 ? gradient[2] :
-                                    gradient[1];
-}
-
 function getColorLycee(zone) {
     return zone == "ouest" ? '#b3de69' : //Vert
         zone == "est" ? '#80b1d3' : //Bleu
@@ -353,7 +311,7 @@ function styleres(feature) {
         color: 'grey',
         dashArray: '3',
         fillOpacity: 0.6,
-        fillColor: getColorRes(colData[feature.properties['code1']]['txreu'])
+        fillColor: colData[feature.properties['code1']]['colreu']
     };
 }
 
@@ -364,7 +322,7 @@ function stylemention(feature) {
         color: 'grey',
         dashArray: '3',
         fillOpacity: 0.6,
-        fillColor: getColorMention(colData[feature.properties['code1']]['txmention'])
+        fillColor: colData[feature.properties['code1']]['colmention']
     };
 }
 
