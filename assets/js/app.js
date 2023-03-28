@@ -614,7 +614,7 @@ var colleges = new L.GeoJSON.AJAX("data/colleges.geojson", {
 /* Lycées */
 var lycees = new L.GeoJSON.AJAX("data/lycees.geojson", {
     pointToLayer: function (feature, latlng) {
-        return L.marker(latlng, { icon: iconeRouge }).bindPopup(infoLyc(feature.properties.nom, feature.properties.adresse, feature.properties.cp, feature.properties.type));
+        return L.marker(latlng, { icon: iconeRouge }).bindPopup(infoLyc(feature.properties.patronyme_uai, feature.properties.adresse_uai, feature.properties.code_postal_uai, feature.properties.nature_uai_libe));
     }
 });
 
@@ -622,50 +622,50 @@ var lycees = new L.GeoJSON.AJAX("data/lycees.geojson", {
 /* Lycées d'enseignement général*/
 var lycees_eg = new L.GeoJSON.AJAX("data/lycees.geojson", {
     filter: function (feature, layer) {
-        return feature.properties.nature == 302;
+        return feature.properties.nature_uai == 302 && feature.properties.secteur_public_prive_libe == "Public";
     },
     pointToLayer: function (feature, latlng) {
-        return L.marker(latlng, { icon: iconeRouge }).bindPopup(infoLyc(feature.properties.nom, feature.properties.adresse, feature.properties.cp, feature.properties.type));
+        return L.marker(latlng, { icon: iconeRouge }).bindPopup(infoLyc(feature.properties.patronyme_uai, feature.properties.adresse_uai, feature.properties.code_postal_uai, feature.properties.nature_uai_libe));
     }
 });
 
 /* Lycées d'enseignement technologique */
 var lycees_tech = new L.GeoJSON.AJAX("data/lycees.geojson", {
     filter: function (feature, layer) {
-        return feature.properties.nature == 301;
+        return feature.properties.nature_uai == 301;
     },
     pointToLayer: function (feature, latlng) {
-        return L.marker(latlng, { icon: iconeVert }).bindPopup(infoLyc(feature.properties.nom, feature.properties.adresse, feature.properties.cp, feature.properties.type));
+        return L.marker(latlng, { icon: iconeVert }).bindPopup(infoLyc(feature.properties.patronyme_uai, feature.properties.adresse_uai, feature.properties.code_postal_uai, feature.properties.nature_uai_libe));
     }
 });
 
 /* Lycées d'enseignement général et technologique*/
 var lycees_eg_tech = new L.GeoJSON.AJAX("data/lycees.geojson", {
     filter: function (feature, layer) {
-        return feature.properties.nature == 300;
+        return feature.properties.nature_uai == 300 && feature.properties.secteur_public_prive_libe == "Public";
     },
     pointToLayer: function (feature, latlng) {
-        return L.marker(latlng, { icon: iconeOrange }).bindPopup(infoLyc(feature.properties.nom, feature.properties.adresse, feature.properties.cp, feature.properties.type));
+        return L.marker(latlng, { icon: iconeOrange }).bindPopup(infoLyc(feature.properties.patronyme_uai, feature.properties.adresse_uai, feature.properties.code_postal_uai, feature.properties.nature_uai_libe));
     }
 });
 
 /* Lycées polyvalents*/
 var lycees_poly = new L.GeoJSON.AJAX("data/lycees.geojson", {
     filter: function (feature, layer) {
-        return feature.properties.nature == 306;
+        return feature.properties.nature_uai == 306 && feature.properties.secteur_public_prive_libe == "Public";
     },
     pointToLayer: function (feature, latlng) {
-        return L.marker(latlng, { icon: iconeViolet }).bindPopup(infoLyc(feature.properties.nom, feature.properties.adresse, feature.properties.cp, feature.properties.type));
+        return L.marker(latlng, { icon: iconeViolet }).bindPopup(infoLyc(feature.properties.patronyme_uai, feature.properties.adresse_uai, feature.properties.code_postal_uai, feature.properties.nature_uai_libe));
     }
 });
 
 /* Lycées professionnels*/
 var lycees_pro = new L.GeoJSON.AJAX("data/lycees.geojson", {
     filter: function (feature, layer) {
-        return feature.properties.nature == 320;
+        return feature.properties.nature_uai == 320 && feature.properties.secteur_public_prive_libe == "Public";
     },
     pointToLayer: function (feature, latlng) {
-        return L.marker(latlng, { icon: iconeJaune }).bindPopup(infoLyc(feature.properties.nom, feature.properties.adresse, feature.properties.cp, feature.properties.type));
+        return L.marker(latlng, { icon: iconeJaune }).bindPopup(infoLyc(feature.properties.patronyme_uai, feature.properties.adresse_uai, feature.properties.code_postal_uai, feature.properties.nature_uai_libe));
     }
 });
 
