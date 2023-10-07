@@ -1,0 +1,6 @@
+colour
+fuzzywuzzy
+geopandas
+pandas
+scipy
+unidecode

@@ -287,8 +287,6 @@ function getColorLycee(zone) {
                     '#FFFFB2';
 }
 
-var colorsSecto = ['#80b1d3', '#8dd3c7', '#b3de69', '#bc80bd', '#bebada', '#ccebc5', '#d9d9d9', '#fb8072', '#fccde5', '#fdb462', '#ffed6f', '#ffffb3'];
-
 
 /*Style layer secteurs collèges*/
 function style(feature) {
@@ -299,7 +297,7 @@ function style(feature) {
         color: 'grey',
         dashArray: '3',
         fillOpacity: 0.6,
-        fillColor: colData[feature.properties['code1']]['colzone']
+        fillColor: feature.properties['colzone']
     };
 }
 
@@ -311,7 +309,7 @@ function styleres(feature) {
         color: 'grey',
         dashArray: '3',
         fillOpacity: 0.6,
-        fillColor: colData[feature.properties['code1']]['colreu']
+        fillColor: feature.properties['colreussite']
     };
 }
 
@@ -322,7 +320,7 @@ function stylemention(feature) {
         color: 'grey',
         dashArray: '3',
         fillOpacity: 0.6,
-        fillColor: colData[feature.properties['code1']]['colmention']
+        fillColor: feature.properties['colmention']
     };
 }
 
@@ -409,10 +407,10 @@ function clickFeature(e) {
 
     var popup;
 
-    for (var i = 1; i <= e.target.feature.properties.nbetab; i++) {
+    for (var i = 0; i < e.target.feature.properties['etabs'].length; i++) {
         popup = L.popup()
-            .setLatLng([colData[e.target.feature.properties['code' + i]]['lat'], colData[e.target.feature.properties['code' + i]]['lng']])
-            .setContent(infoCol(colData[e.target.feature.properties['code' + i]]['nom'], colData[e.target.feature.properties['code' + i]]['adresse'], colData[e.target.feature.properties['code' + i]]['codepostal'], colData[e.target.feature.properties['code' + i]]['txreu'], colData[e.target.feature.properties['code' + i]]['txmention'], false))
+            .setLatLng([e.target.feature.properties['etabs'][i]['lat'], e.target.feature.properties['etabs'][i]['lng']])
+            .setContent(infoCol(e.target.feature.properties['etabs'][i]['nom'], e.target.feature.properties['etabs'][i]['adresse'], e.target.feature.properties['etabs'][i]['code_postal'], e.target.feature.properties['etabs'][i]['txreussite'], e.target.feature.properties['etabs'][i]['txmention'], false))
         map.addLayer(popup);
         popupList.push(popup);
     }
@@ -467,13 +465,6 @@ function onEachFeatureLyc(feature, layer) {
     });
 }
 
-/*Initialisation colleges_data dans colData (contient toutes les infos liées aux collèges : nom, tx reussite ...)*/
-var colData = {};
-$.getJSON("data/colleges_data.json", function (json) {
-    colData = json;
-});
-
-
 /* Declaration map object */
 var map = new L.Map("map", {
     center: new L.LatLng(48.856515, 2.343920),
@@ -516,50 +507,6 @@ if (L.Browser.touch) {
     $('#recenter').css(touchControl);
 }
 
-/*Bouton pour switcher HD/SD */
-
-var resolution = L.easyButton({
-    id: 'resolution',
-    leafletClasses: true,
-    position: 'topright',
-    states: [{
-        stateName: 'sd',
-        icon: 'glyphicon glyphicon-hd-video',
-        onClick: function (btn, map) {
-
-            if (map.hasLayer(colSecteurs)) {
-                map.removeLayer(colSecteurs);
-                colSecteurs = L.geoJson.ajax("data/secteurs_col.geojson", {
-                    style: style,
-                    onEachFeature: onEachFeature
-                }).addTo(map);
-                btn.state('hd');
-            }
-
-        }
-    },
-    {
-        stateName: 'hd',
-        icon: 'glyphicon glyphicon-sd-video',
-        onClick: function (btn, map) {
-            if (map.hasLayer(colSecteurs)) {
-                map.removeLayer(colSecteurs);
-                colSecteurs = L.geoJson.ajax("data/secteurs_col_light.geojson", {
-                    style: style,
-                    onEachFeature: onEachFeature
-                }).addTo(map);
-                btn.state('sd');
-            }
-
-        }
-    }
-    ]
-});
-resolution.addTo(map);
-
-if (L.Browser.touch) {
-    $('#resolution').css(touchControl);
-}
 
 /* Ajout du base layer */
 map.addLayer(new L.StamenTileLayer(
@@ -589,7 +536,7 @@ var locateControl = L.control.locate({
     strings: {
         title: "Ma position",
         popup: "You are within {distance} {unit} from this point",
-        outsideMapBoundsMsg: "Il semblerait que vous soyez à l'éxterieur des limites de cette carte"
+        outsideMapBoundsMsg: "Il semblerait que vous soyez à l'extérieur des limites de cette carte"
     },
     locateOptions: {
         maxZoom: 17,
@@ -605,9 +552,11 @@ var locateControl = L.control.locate({
 /* Collèges */
 
 var colleges = new L.GeoJSON.AJAX("data/colleges.geojson", {
+    filter: function (feature, layer) {
+        return feature.geometry.type == "Point"
+    },
     pointToLayer: function (feature, latlng) {
-        //console.log(infoCol(colData[feature.properties['code' + i]]['nom'], colData[feature.properties['code' + i]]['adresse'], colData[feature.properties['code' + i]]['codepostal'], colData[feature.properties['code' + i]]['txreu'], colData[feature.properties['code' + i]]['txmention'], false));
-        return L.marker(latlng, { icon: iconeBleue }).bindPopup(infoCol(colData[feature.properties['code']]['nom'], colData[feature.properties['code']]['adresse'], colData[feature.properties['code']]['codepostal'], colData[feature.properties['code']]['txreu'], colData[feature.properties['code']]['txmention'], false));
+        return L.marker(latlng, { icon: iconeBleue }).bindPopup(infoCol(feature.properties['nom'], feature.properties['adresse'], feature.properties['code_postal'], feature.properties['txreussite'], feature.properties['txmention'], false));
     }
 });
 
@@ -672,7 +621,10 @@ var lycees_pro = new L.GeoJSON.AJAX("data/lycees.geojson", {
 
 /* Secteurs collèges */
 
-colSecteurs = L.geoJson.ajax("data/secteurs_col_light.geojson", {
+colSecteurs = L.geoJson.ajax("data/colleges.geojson", {
+    filter: function (feature, layer) {
+        return feature.geometry.type == "MultiPolygon"
+    },
     style: style,
     onEachFeature: onEachFeature
 });
@@ -789,11 +741,11 @@ $(function () {
 
 
                 // on cherche la bounding box de la zone de zoom
-                for (let i = 1; i <= closestLayer[0].feature.properties.nbetab; i++) {
+                for (let i = 0; i < closestLayer[0].feature.properties['etabs'].length; i++) {
 
 
-                    var tmpLat = colData[closestLayer[0].feature.properties['code' + i]]['lat'];
-                    var tmpLon = colData[closestLayer[0].feature.properties['code' + i]]['lng'];
+                    var tmpLat = closestLayer[0].feature.properties['etabs'][i]['lat'];
+                    var tmpLon = closestLayer[0].feature.properties['etabs'][i]['lng'];
 
                     if (tmpLat > latMax) { latMax = tmpLat; }
                     if (tmpLat < latMin) { latMin = tmpLat; }
@@ -809,13 +761,13 @@ $(function () {
 
 
                 // on itère sur les collèges de la zone (let pour scoper id et éviter fuite dans le callback)
-                for (let id = 1; id <= closestLayer[0].feature.properties.nbetab; id++) {
+                for (let id = 0; id < closestLayer[0].feature.properties['etabs'].length; id++) {
 
 
-                    collegeLocation[id] = new L.LatLng(colData[closestLayer[0].feature.properties['code' + id]]['lat'], colData[closestLayer[0].feature.properties['code' + id]]['lng']);
+                    collegeLocation[id] = new L.LatLng(closestLayer[0].feature.properties['etabs'][id]['lat'], closestLayer[0].feature.properties['etabs'][id]['lng']);
 
-                    arrivee.lat = colData[closestLayer[0].feature.properties['code' + id]]['lat'];
-                    arrivee.lon = colData[closestLayer[0].feature.properties['code' + id]]['lng'];
+                    arrivee.lat = closestLayer[0].feature.properties['etabs'][id]['lat'];
+                    arrivee.lon = closestLayer[0].feature.properties['etabs'][id]['lng'];
 
 
                     // Recuperation du chemin à pied 
@@ -858,7 +810,7 @@ $(function () {
 
                         popupCollege[id] = L.popup()
                             .setLatLng(collegeLocation[id])
-                            .setContent(infoColPath(colData[closestLayer[0].feature.properties['code' + id]]['nom'], colData[closestLayer[0].feature.properties['code' + id]]['adresse'], colData[closestLayer[0].feature.properties['code' + id]]['codepostal'], colData[closestLayer[0].feature.properties['code' + id]]['txreu'], colData[closestLayer[0].feature.properties['code' + id]]['txmention'], false, time, length));
+                            .setContent(infoColPath(closestLayer[0].feature.properties['etabs'][id]['nom'], closestLayer[0].feature.properties['etabs'][id]['adresse'], closestLayer[0].feature.properties['etabs'][id]['code_postal'], closestLayer[0].feature.properties['etabs'][id]['txreussite'], closestLayer[0].feature.properties['etabs'][id]['txmention'], false, time, length));
 
                         map.addLayer(popupCollege[id]);
                         layerList.push(popupCollege[id]);
