@@ -510,11 +510,19 @@ if (L.Browser.touch) {
 
 // Ajout du base layer 
 
+/* Stadia
 map.addLayer(new L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}.png', {
     attribution: `&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a>
     &copy; <a href="https://stamen.com/" target="_blank">Stamen Design</a>
     &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>
     &copy; <a href="https://www.openstreetmap.org/about/" target="_blank">OpenStreetMap contributors</a>`,
+    detectRetina: false
+}))
+*/
+
+// OSM
+map.addLayer(new L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: `&copy; <a href="https://www.openstreetmap.org/about/" target="_blank">OpenStreetMap contributors</a>`,
     detectRetina: false
 }))
 
