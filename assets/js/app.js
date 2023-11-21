@@ -395,7 +395,7 @@ function clickFeature(e) {
 
 
     this.setStyle({
-        weight: 5,
+        weight: 2,
         color: '#666',
         dashArray: '',
         fillOpacity: 0.9
