@@ -48,12 +48,13 @@ def get_colleges_reussite_brevet():
     payload = [
         ("refine", f'session:"{session}"'),
         ("refine", f'secteur_d_enseignement:"{secteur.upper()}"'),
-        ("refine", f'departement:"{departement}"'),
+        ("refine", f'code_departement:"{departement}"'),
         ("use_labels", True),
         ("delimiter", delimiter),
     ]
 
     full_url = f"{base_url}/{dataset}/exports/csv?{urlencode(payload)}"
+    print(full_url)
 
     return pd.read_csv(full_url, delimiter=delimiter)
 
@@ -292,7 +293,7 @@ def generate_geojson_colleges(id_projet, path):
 
 if __name__ == "__main__":
     generate_geojson_colleges(
-        id_projet="COLLEGES (année scolaire 2023/2024)",
+        id_projet="COLLEGES (année scolaire 2024/2025)",
         path=os.path.realpath(
             os.path.join(__file__, "..", "..", "data", "colleges.geojson")
         ),
