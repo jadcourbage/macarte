@@ -33,7 +33,21 @@ python run_pipeline.py
 This regenerates `data/colleges.geojson` with current school year data.
 
 ### Run Locally
-Open `index.html` in a browser. No build step required.
+```bash
+python -m http.server 8000
+# Then open http://localhost:8000
+```
+A local server is required because the app loads GeoJSON files via AJAX.
+
+## User Features
+
+Implemented in `assets/js/app.js`:
+- **Address search**: Autocomplete geocoding identifies the school sector for an address
+- **College views**: Toggle between sector map, pass rate choropleth, or distinction rate choropleth
+- **Lycée views**: Toggle sector map and filter by school type (general, tech, polyvalent, professional)
+- **Sector click**: Shows popup with assigned school(s) and their Brevet results
+- **Walking route**: When searching an address, displays walking distance/time to assigned school(s)
+- **Geolocation**: Locate user position on map
 
 ## Key Technical Details
 
