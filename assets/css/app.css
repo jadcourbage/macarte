@@ -110,20 +110,23 @@ input[type="radio"], input[type="checkbox"] {
   bottom: 0px;
   overflow: auto;
 }
-.leaflet-control-layers {
-  overflow: auto;
-}
-.leaflet-control-layers label {
-  font-weight: normal;
-  margin-bottom: 0px;
-}
-.leaflet-control-layers-list input[type="radio"], input[type="checkbox"] {
-  margin: 2px;
+/* MapLibre popup styles */
+.maplibregl-popup-content {
+  font-family: "Verdana";
+  font-size: 11px;
+  padding: 10px 15px;
+  border-radius: 4px;
 }
 
-.leaflet-popup-content-wrapper {
-      font-family: "Verdana";
-      font-size: 11px;
+.maplibregl-popup-close-button {
+  font-size: 18px;
+  padding: 2px 6px;
+}
+
+/* MapLibre control button styles */
+.maplibregl-ctrl-group button {
+  width: 29px;
+  height: 29px;
 }
 
 
@@ -286,7 +289,7 @@ input[type="radio"], input[type="checkbox"] {
   .navbar {
     display: none !important;
   }
-  .leaflet-control-container {
+  .maplibregl-control-container {
     display: none !important;
   }
 }
