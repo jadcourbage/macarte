@@ -838,30 +838,24 @@ function setupAddressSearch() {
                     ? JSON.parse(matchingSector.properties.etabs)
                     : matchingSector.properties.etabs;
 
-                // Calculate bounds
-                const bounds = new maplibregl.LngLatBounds();
-                bounds.extend([lng, lat]);
-
-                etabs.forEach(etab => {
-                    bounds.extend([etab.lng, etab.lat]);
-                });
-
-                // Zoom to bounds
-                map.fitBounds(bounds, { padding: 100 });
-
-                // Get walking routes for each school
+                // Get walking routes for each school and fit bounds to routes
                 const apiKey = '5b3ce3597851110001cf6248ee803844fe274e8ebed6859bd79ec801';
+                const routeBounds = new maplibregl.LngLatBounds();
+                routeBounds.extend([lng, lat]);
 
-                etabs.forEach((etab, index) => {
+                const routePromises = etabs.map((etab, index) => {
                     const routeUrl = `https://api.openrouteservice.org/v2/directions/foot-walking?api_key=${apiKey}&start=${lng},${lat}&end=${etab.lng},${etab.lat}`;
 
-                    $.getJSON(routeUrl, function(response) {
+                    return $.getJSON(routeUrl).then(function(response) {
                         const routeCoords = response.features[0].geometry.coordinates;
                         const duration = response.features[0].properties.summary.duration;
                         const distance = response.features[0].properties.summary.distance;
 
                         const time = Math.round(duration / 60);
                         const length = Math.round(distance);
+
+                        // Extend bounds with all route coordinates
+                        routeCoords.forEach(coord => routeBounds.extend(coord));
 
                         // Add route line
                         const routeId = `route-${index}`;
@@ -914,6 +908,11 @@ function setupAddressSearch() {
 
                         activePopups.push(popup);
                     });
+                });
+
+                // Fit bounds after all routes are loaded
+                Promise.all(routePromises).then(() => {
+                    map.fitBounds(routeBounds, { padding: 80 });
                 });
 
             } else {
