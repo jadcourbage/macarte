@@ -195,10 +195,11 @@ input[type="radio"], input[type="checkbox"] {
   height: 34px;
   line-height: 34px;
   text-align: center;
+}
 
-.star{
- font-size: 1.5em;
-} 
+.star {
+  font-size: 1.5em;
+}
 
 .ui-autocomplete {
   position: absolute;
@@ -206,51 +207,36 @@ input[type="radio"], input[type="checkbox"] {
   left: 0;
   z-index: 95543;
   float: left;
-  display: none;
   min-width: 160px;
-  _width: 160px;
   padding: 4px 0;
   margin: 2px 0 0 0;
   list-style: none;
   background-color: #ffffff;
-  border-color: #ccc;
   border-color: rgba(0, 0, 0, 0.2);
   border-style: solid;
   border-width: 1px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
   border-radius: 5px;
-  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  -webkit-background-clip: padding-box;
-  -moz-background-clip: padding;
   background-clip: padding-box;
-  *border-right-width: 2px;
-  *border-bottom-width: 2px;
+}
 
-  .ui-menu-item {
+.ui-autocomplete .ui-menu-item {
   display: block;
-  padding: 3px 15px;
+  padding: 8px 15px;
   clear: both;
   font-weight: normal;
-  line-height: 18px;
-  color: #C91818;
+  line-height: 20px;
+  color: #333;
   white-space: nowrap;
-
-  &.ui-state-focus {
-    color: #ffffff;
-    text-decoration: none;
-    background-color: #0088cc;
-    border-radius: 0px;
-    -webkit-border-radius: 0px;
-    -moz-border-radius: 0px;
-    background-image: none;
-  }
-}
+  cursor: pointer;
 }
 
-
+.ui-autocomplete .ui-menu-item.ui-state-focus,
+.ui-autocomplete .ui-menu-item.ui-state-active {
+  color: #ffffff;
+  text-decoration: none;
+  background-color: #0088cc;
+  border-radius: 0;
 }
 @media (max-width: 992px) {
   .navbar .navbar-brand {
@@ -267,6 +253,109 @@ input[type="radio"], input[type="checkbox"] {
     -webkit-hyphens: auto;
       hyphens: auto;
   }
+
+  /* Hide navbar search on mobile (using mobile search bar instead) */
+  .navbar-form {
+    display: none;
+  }
+
+  /* Mobile search bar */
+  #mobile-search {
+    position: fixed;
+    top: 58px;
+    left: 12px;
+    right: 12px;
+    z-index: 1000;
+    background: transparent;
+  }
+  #mobile-search .form-control {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    border-radius: 28px;
+    padding: 10px 18px;
+    height: 44px;
+    font-size: 16px; /* Prevents iOS zoom on focus */
+    border: none;
+    background-color: #ffffff;
+  }
+  #mobile-search .form-control:focus {
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+    outline: none;
+  }
+
+  /* Larger touch-friendly map controls */
+  .maplibregl-ctrl-group button {
+    width: 44px;
+    height: 44px;
+  }
+  .maplibregl-ctrl-group button .glyphicon,
+  .maplibregl-ctrl-group button .fa {
+    font-size: 18px;
+    line-height: 44px;
+  }
+
+  /* Compact popups for mobile */
+  .maplibregl-popup-content {
+    max-width: 280px;
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+  .maplibregl-popup-content h4 {
+    font-size: 14px;
+    margin: 0 0 5px 0;
+  }
+  .maplibregl-popup-close-button {
+    font-size: 20px;
+    padding: 4px 8px;
+  }
+
+
+  /* Mobile autocomplete dropdown styling */
+  ul.ui-autocomplete.ui-menu {
+    position: fixed !important;
+    top: 110px !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    border: none !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    background-color: #ffffff !important;
+    padding: 8px 0 !important;
+    margin: 0 !important;
+  }
+
+  ul.ui-autocomplete.ui-menu .ui-menu-item {
+    display: flex !important;
+    align-items: center !important;
+    padding: 14px 18px !important;
+    margin: 0 !important;
+    list-style: none !important;
+    font-size: 15px !important;
+    color: #333 !important;
+    line-height: 1.4 !important;
+    cursor: pointer !important;
+    white-space: normal !important;
+  }
+
+  ul.ui-autocomplete.ui-menu .ui-menu-item::before {
+    content: "\f041";
+    font-family: FontAwesome;
+    font-size: 16px;
+    color: #999;
+    margin-right: 14px;
+    flex-shrink: 0;
+  }
+
+  ul.ui-autocomplete.ui-menu .ui-menu-item.ui-state-focus,
+  ul.ui-autocomplete.ui-menu .ui-menu-item.ui-state-active {
+    background-color: #f5f5f5 !important;
+    color: #333 !important;
+  }
+
+  ul.ui-autocomplete.ui-menu .ui-menu-item + .ui-menu-item {
+    border-top: 1px solid #eee;
+  }
 }
 
 /*@media screen and (max-width: 767px) , screen and (min-height: 450x) {
@@ -282,7 +371,113 @@ input[type="radio"], input[type="checkbox"] {
   height: 30px;
  }*/
 
+/* Hide navbar search on desktop (using floating search panel instead) */
+.navbar-form {
+  display: none;
+}
 
+/* ====================================
+   Desktop Search Panel - Google Maps Style
+   ==================================== */
+#desktop-search {
+  position: fixed;
+  top: 60px;
+  left: 16px;
+  z-index: 1000;
+  width: 400px;
+  max-width: calc(100vw - 32px);
+}
+
+#desktop-search .search-panel {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+#desktop-search .search-input-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  height: 48px;
+}
+
+#desktop-search .search-icon {
+  color: #5f6368;
+  font-size: 16px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+#desktop-search .search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: #202124;
+  background: transparent;
+  height: 100%;
+  padding: 0;
+}
+
+#desktop-search .search-input::placeholder {
+  color: #9aa0a6;
+}
+
+/* Desktop autocomplete - seamlessly attached to search panel */
+#desktop-search .ui-autocomplete {
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 8px 0 !important;
+  border-top: 1px solid #e8eaed !important;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+#desktop-search .ui-autocomplete .ui-menu-item {
+  display: flex !important;
+  align-items: center !important;
+  padding: 10px 16px !important;
+  font-size: 14px !important;
+  color: #202124 !important;
+  line-height: 1.4 !important;
+  cursor: pointer !important;
+  white-space: normal !important;
+}
+
+#desktop-search .ui-autocomplete .ui-menu-item::before {
+  content: "\f041";
+  font-family: FontAwesome;
+  font-size: 16px;
+  color: #ea4335;
+  margin-right: 14px;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+#desktop-search .ui-autocomplete .ui-menu-item.ui-state-focus,
+#desktop-search .ui-autocomplete .ui-menu-item.ui-state-active {
+  background-color: #f1f3f4 !important;
+  color: #202124 !important;
+}
+
+/* When autocomplete is open, adjust panel shadow */
+#desktop-search .search-panel.autocomplete-open {
+  border-radius: 8px 8px 0 0;
+}
+
+#desktop-search .search-panel.autocomplete-open + .ui-autocomplete,
+#desktop-search .ui-autocomplete {
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+}
 
 /* Print Handling */
 @media print {

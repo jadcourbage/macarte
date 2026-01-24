@@ -12,8 +12,13 @@ let lastClickedSectorId = null;
 let locationMarker = null;
 let userLocationMarker = null;
 
-// Paris bounds
-const parisBounds = [[2.251302, 48.816353], [2.413865, 48.902916]];
+// Paris bounds - tightened to focus on Paris proper
+const parisBounds = [[2.27, 48.815], [2.42, 48.905]];
+
+// Mobile detection helper
+function isMobile() {
+    return window.innerWidth < 768;
+}
 
 // Colors for school markers
 const COLORS = {
@@ -69,7 +74,7 @@ function toggleMenu(item) {
 
 // Initialize menu states
 function initMenuState() {
-    if ($(window).height() > 700) {
+    if (!isMobile()) {
         $('#colleges-btn').data('selected', true);
     } else {
         $('#colleges-btn').data('selected', false);
@@ -530,7 +535,7 @@ async function loadDataAndAddLayers() {
                 'circle-stroke-width': 2
             },
             layout: {
-                visibility: $(window).height() > 700 ? 'visible' : 'none'
+                visibility: isMobile() ? 'none' : 'visible'
             }
         });
 
@@ -770,9 +775,9 @@ function setupHoverHandlers() {
     });
 }
 
-// Address search with autocomplete
-function setupAddressSearch() {
-    $("#searchbox").autocomplete({
+// Address search autocomplete configuration
+function getAutocompleteConfig() {
+    return {
         source: function(request, response) {
             $.ajax({
                 url: "https://api-adresse.data.gouv.fr/search/",
@@ -808,7 +813,8 @@ function setupAddressSearch() {
                 locationMarker = null;
             }
 
-            $("#nav-btn").click();
+            // Close mobile navbar if open
+            $(".navbar-collapse.in").collapse("hide");
 
             const lng = ui.item.lon;
             const lat = ui.item.lat;
@@ -942,7 +948,32 @@ function setupAddressSearch() {
         close: function() {
             $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
         }
+    };
+}
+
+// Address search with autocomplete
+function setupAddressSearch() {
+    const config = getAutocompleteConfig();
+
+    // Legacy desktop search box (navbar - hidden but kept for compatibility)
+    $("#searchbox").autocomplete(config);
+
+    // Mobile search box
+    $("#searchbox-mobile").autocomplete(config);
+
+    // New desktop search panel - Google Maps style
+    const desktopConfig = $.extend({}, config, {
+        appendTo: "#desktop-search .search-panel",
+        open: function() {
+            $(this).removeClass("ui-corner-all").addClass("ui-corner-top");
+            $("#desktop-search .search-panel").addClass("autocomplete-open");
+        },
+        close: function() {
+            $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
+            $("#desktop-search .search-panel").removeClass("autocomplete-open");
+        }
     });
+    $("#searchbox-desktop").autocomplete(desktopConfig);
 }
 
 // Event handlers setup
@@ -956,7 +987,7 @@ function setupEventHandlers() {
 
     // Prevent dropdown from closing on click (desktop only)
     $('.dropdown-menu').on('click', function(event) {
-        if ($(window).height() > 700) {
+        if (!isMobile()) {
             event.stopPropagation();
         }
     });
@@ -1003,12 +1034,12 @@ function setupEventHandlers() {
         return false;
     });
 
-    // Search box handlers
-    $("#searchbox").click(function() {
+    // Search box handlers (desktop and mobile)
+    $("#searchbox, #searchbox-mobile, #searchbox-desktop").click(function() {
         $(this).select();
     });
 
-    $("#searchbox").keypress(function(e) {
+    $("#searchbox, #searchbox-mobile, #searchbox-desktop").keypress(function(e) {
         if (e.which == 13) {
             e.preventDefault();
         }
