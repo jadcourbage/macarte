@@ -455,7 +455,7 @@ input[type="radio"], input[type="checkbox"] {
   content: "\f041";
   font-family: FontAwesome;
   font-size: 16px;
-  color: #ea4335;
+  color: #999;
   margin-right: 14px;
   flex-shrink: 0;
   width: 20px;
