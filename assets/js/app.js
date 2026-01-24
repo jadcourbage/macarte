@@ -529,10 +529,10 @@ async function loadDataAndAddLayers() {
             source: 'colleges',
             filter: ['==', ['geometry-type'], 'Point'],
             paint: {
-                'circle-radius': 8,
+                'circle-radius': 6,
                 'circle-color': COLORS.college,
                 'circle-stroke-color': '#ffffff',
-                'circle-stroke-width': 2
+                'circle-stroke-width': 1
             },
             layout: {
                 visibility: isMobile() ? 'none' : 'visible'
@@ -550,10 +550,10 @@ async function loadDataAndAddLayers() {
                 ['==', ['get', 'secteur_public_prive_libe'], 'Public']
             ],
             paint: {
-                'circle-radius': 8,
+                'circle-radius': 6,
                 'circle-color': COLORS.lyceeEG,
                 'circle-stroke-color': '#ffffff',
-                'circle-stroke-width': 2
+                'circle-stroke-width': 1
             },
             layout: {
                 visibility: 'none'
@@ -567,10 +567,10 @@ async function loadDataAndAddLayers() {
             source: 'lycees',
             filter: ['==', ['get', 'nature_uai'], 301],
             paint: {
-                'circle-radius': 8,
+                'circle-radius': 6,
                 'circle-color': COLORS.lyceeTech,
                 'circle-stroke-color': '#ffffff',
-                'circle-stroke-width': 2
+                'circle-stroke-width': 1
             },
             layout: {
                 visibility: 'none'
@@ -587,10 +587,10 @@ async function loadDataAndAddLayers() {
                 ['==', ['get', 'secteur_public_prive_libe'], 'Public']
             ],
             paint: {
-                'circle-radius': 8,
+                'circle-radius': 6,
                 'circle-color': COLORS.lyceeEGTech,
                 'circle-stroke-color': '#ffffff',
-                'circle-stroke-width': 2
+                'circle-stroke-width': 1
             },
             layout: {
                 visibility: 'none'
@@ -607,10 +607,10 @@ async function loadDataAndAddLayers() {
                 ['==', ['get', 'secteur_public_prive_libe'], 'Public']
             ],
             paint: {
-                'circle-radius': 8,
+                'circle-radius': 6,
                 'circle-color': COLORS.lyceePoly,
                 'circle-stroke-color': '#ffffff',
-                'circle-stroke-width': 2
+                'circle-stroke-width': 1
             },
             layout: {
                 visibility: 'none'
@@ -627,10 +627,10 @@ async function loadDataAndAddLayers() {
                 ['==', ['get', 'secteur_public_prive_libe'], 'Public']
             ],
             paint: {
-                'circle-radius': 8,
+                'circle-radius': 6,
                 'circle-color': COLORS.lyceePro,
                 'circle-stroke-color': '#ffffff',
-                'circle-stroke-width': 2
+                'circle-stroke-width': 1
             },
             layout: {
                 visibility: 'none'
