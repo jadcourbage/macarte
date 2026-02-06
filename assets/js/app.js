@@ -655,14 +655,19 @@ function setupClickHandlers() {
         if (e.features.length === 0) return;
 
         const feature = e.features[0];
-        const coordinates = feature.geometry.coordinates.flat(2);
-        const bounds = coordinates.reduce((bounds, coord) => {
-                    return bounds.extend(coord);
-                }, new maplibregl.LngLatBounds(coordinates[0], coordinates[0]));
 
         const etabs = typeof feature.properties.etabs === 'string'
             ? JSON.parse(feature.properties.etabs)
             : feature.properties.etabs;
+
+        // Use original GeoJSON geometry (click event geometry may be clipped to tile boundaries)
+        const fullFeature = collegesData.features.find(f =>
+            f.geometry.type === 'MultiPolygon' && f.properties.etabs[0].nom === etabs[0].nom);
+        const geom = fullFeature ? fullFeature.geometry : feature.geometry;
+        const coordinates = geom.coordinates.flat(2);
+        const bounds = coordinates.reduce((bounds, coord) => {
+                    return bounds.extend(coord);
+                }, new maplibregl.LngLatBounds(coordinates[0], coordinates[0]));
 
         // Clear previous popups
         clearPopups();
@@ -745,7 +750,10 @@ function setupClickHandlers() {
         if (e.features.length === 0) return;
 
         const feature = e.features[0];
-        const bounds = turf.bbox(feature);
+        // Use original GeoJSON geometry (click event geometry may be clipped to tile boundaries)
+        const fullFeature = lycSecsData.features.find(f =>
+            f.properties.cartodb_id === feature.properties.cartodb_id);
+        const bounds = turf.bbox(fullFeature || feature);
 
         map.fitBounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]], { padding: 50 });
     });
