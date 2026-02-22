@@ -856,12 +856,11 @@ function getAutocompleteConfig() {
                     : matchingSector.properties.etabs;
 
                 // Get walking routes for each school and fit bounds to routes
-                const apiKey = '5b3ce3597851110001cf6248ee803844fe274e8ebed6859bd79ec801';
                 const routeBounds = new maplibregl.LngLatBounds();
                 routeBounds.extend([lng, lat]);
 
                 const routePromises = etabs.map((etab, index) => {
-                    const routeUrl = `https://api.openrouteservice.org/v2/directions/foot-walking?api_key=${apiKey}&start=${lng},${lat}&end=${etab.lng},${etab.lat}`;
+                    const routeUrl = `/.netlify/functions/route?start=${lng},${lat}&end=${etab.lng},${etab.lat}`;
 
                     return $.getJSON(routeUrl).then(function(response) {
                         const routeCoords = response.features[0].geometry.coordinates;

@@ -284,13 +284,13 @@ input[type="radio"], input[type="checkbox"] {
 
   /* Larger touch-friendly map controls */
   .maplibregl-ctrl-group button {
-    width: 44px;
-    height: 44px;
+    width: 36px;
+    height: 36px;
   }
   .maplibregl-ctrl-group button .glyphicon,
   .maplibregl-ctrl-group button .fa {
-    font-size: 18px;
-    line-height: 44px;
+    font-size: 16px;
+    line-height: 36px;
   }
 
   /* Compact popups for mobile */

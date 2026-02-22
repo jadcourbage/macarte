@@ -2,12 +2,12 @@ import json
 import os
 import random
 import re
+import warnings
 from urllib.parse import urlencode
 
 import geopandas as gpd
 import pandas as pd
 from colour import Color
-from fuzzywuzzy import process
 from scipy import stats
 from unidecode import unidecode
 
@@ -40,15 +40,13 @@ def get_colleges_reussite_brevet():
     """
     base_url = "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/"
 
-    dataset = "fr-en-dnb-par-etablissement"
-    session = 2021
-    secteur = "public"
-    departement = "075"
+    dataset = "fr-en-indicateurs-valeur-ajoutee-colleges"
+    session = 2024
+    departement = "PARIS"
     delimiter = ";"
     payload = [
         ("refine", f'session:"{session}"'),
-        ("refine", f'secteur_d_enseignement:"{secteur.upper()}"'),
-        ("refine", f'code_departement:"{departement}"'),
+        ("refine", f'departement:"{departement}"'),
         ("use_labels", True),
         ("delimiter", delimiter),
     ]
@@ -59,20 +57,14 @@ def get_colleges_reussite_brevet():
     return pd.read_csv(full_url, delimiter=delimiter)
 
 
-class CollegeMatchingError(Exception):
-    pass
+UAI_MAPPING_PATH = os.path.join(os.path.dirname(__file__), "uai_mapping.csv")
 
 
-def fuzzy_match_college(nom_paris, df_educnat):
-    """Trouver le nom de collège s'approchant le plus de `nom_paris` parmis `df_educnat.nom`."""
-    res = process.extractOne(nom_paris, df_educnat.nom, score_cutoff=90)
-    try:
-        nom_educnat = res[0]
-        return df_educnat[df_educnat.nom == nom_educnat].iloc[0]["code"]
-    except TypeError:
-        raise CollegeMatchingError(
-            f'Pas de collège correspondant à "{nom_paris}" dans le CSV de réussite au brevet'
-        )
+def load_uai_mapping():
+    """Charge le mapping nom_paris → UAI depuis le fichier CSV."""
+    df = pd.read_csv(UAI_MAPPING_PATH, dtype=str, sep=";")
+    mapping = dict(zip(df.nom_paris, df.uai))
+    return mapping
 
 
 def clean_nom(string):
@@ -94,15 +86,21 @@ def merge_college_paris_educnat(df_paris, df_educnat):
     Le dataframe de la Ville de Paris contient les noms, adresses et géolocalisations des collèges.
     Le dataframe de l'Éducation Nationale contient les taux de réussite au brevet des collèges.
 
-    Faute de mieux, la jointure est réalisée en faisant un fuzzy matching entre les noms des collèges
-    présents dans les deux datasets.
+    La jointure est réalisée via un fichier de mapping CSV (uai_mapping.csv) qui associe
+    les noms des collèges parisiens à leur code UAI.
     """
-    df_educnat["nom"] = df_educnat.Patronyme.apply(clean_nom)
-    df_paris["code"] = df_paris.nom.apply(clean_nom).apply(
-        lambda x: fuzzy_match_college(x, df_educnat)
-    )
-    df_educnat.drop(columns=["nom"], inplace=True)
-    merged = pd.merge(df_paris, df_educnat, on="code")
+    uai_mapping = load_uai_mapping()
+    df_paris["code"] = df_paris.nom.map(uai_mapping)
+
+    missing = df_paris[df_paris.code.isna()]
+    for nom in missing.nom:
+        warnings.warn(f'Pas de code UAI pour "{nom}" dans uai_mapping.csv')
+
+    merged = pd.merge(df_paris, df_educnat, on="code", how="left")
+    fill_cols = ["txreussite", "txmention", "Presents", "Admis", "Admis sans mention"]
+    for col in fill_cols:
+        if col in merged.columns:
+            merged[col] = merged[col].fillna(0)
     return merged
 
 
@@ -115,12 +113,18 @@ def prepro_df_paris_etab(df):
 
 def prepro_df_educnat(df):
     """Preprocessing de la dataframe issue du dataset de l'Éducation Nationale."""
-    df["txreussite"] = round(100 * df["Admis"] / df["Presents"], ndigits=1)
+    df["txreussite"] = round(df["Taux de réussite G"], ndigits=1)
     df["txmention"] = round(
-        100 * (df["Admis"] - df["Admis sans mention"]) / df["Presents"], ndigits=1
+        100 * df["Nb mentions global G"] / df["Nb candidats G"], ndigits=1
     )
 
-    df["code"] = df["Numero d'etablissement"]
+    df["Presents"] = df["Nb candidats G"]
+    df["Admis"] = round(df["Nb candidats G"] * df["Taux de réussite G"] / 100)
+    df["Admis sans mention"] = df["Admis"] - df["Nb mentions global G"]
+
+    df["Patronyme"] = df["Nom de l'établissement"]
+    df["code"] = df["UAI"]
+
     return df
 
 
@@ -138,7 +142,7 @@ def prepro_df_paris_secto(df_secto, df_etab):
         etabs = []
         for i in [1, 2, 3, 4]:
             nom = row_secto[f"lib_etab_{i}"]
-            if nom != nom:  # C'est un NaN
+            if pd.isna(nom):
                 continue
             etab = df_etab[df_etab.nom == nom].iloc[0]
             etabs.append(etab)
@@ -293,7 +297,7 @@ def generate_geojson_colleges(id_projet, path):
 
 if __name__ == "__main__":
     generate_geojson_colleges(
-        id_projet="COLLEGES (année scolaire 2024/2025)",
+        id_projet="COLLEGES (année scolaire 2025/2026)",
         path=os.path.realpath(
             os.path.join(__file__, "..", "..", "data", "colleges.geojson")
         ),
