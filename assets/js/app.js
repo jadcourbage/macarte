@@ -12,8 +12,9 @@ let lastClickedSectorId = null;
 let locationMarker = null;
 let userLocationMarker = null;
 
-// Paris bounds - tightened to focus on Paris proper
+// Paris bounds
 const parisBounds = [[2.27, 48.815], [2.42, 48.905]];
+const parisBoundsMobile = [[2.30, 48.83], [2.39, 48.88]];
 
 // Mobile detection helper
 function isMobile() {
@@ -99,7 +100,7 @@ function infoCol(nom, adresse, codepostal, txreu, txmention) {
         adresse + '<br/> ' + codepostal + ' PARIS <br/>' +
         '<b>Taux de r&eacute;ussite* : </b>' + ((txreu == 999) ? "N/A" : txreu + '%') + '<br/>' +
         '<b>Taux de mentions* : </b>' + ((txmention == 999) ? "N/A" : txmention + '%') + '<br/>' +
-        '*2021';
+        '*2024';
 }
 
 // Generate HTML content for college popup with walking distance
@@ -110,7 +111,7 @@ function infoColPath(nom, adresse, codepostal, txreu, txmention, time, distance)
         adresse + '<br/> ' + codepostal + ' PARIS <br/>' +
         '<b>Taux de r&eacute;ussite* : </b>' + ((txreu == 999) ? "N/A" : txreu + '%') + '<br/>' +
         '<b>Taux de mentions* : </b>' + ((txmention == 999) ? "N/A" : txmention + '%') + '<br/>' +
-        '*2021';
+        '*2024';
 }
 
 // Generate HTML content for lycée popup
@@ -320,7 +321,8 @@ class RecenterControl {
         button.title = 'Recentrer sur Paris';
         button.innerHTML = '<span class="glyphicon glyphicon-resize-full" style="font-size: 14px; line-height: 29px;"></span>';
         button.onclick = () => {
-            map.fitBounds(parisBounds, { padding: 20 });
+            const isMobile = window.innerWidth <= 768;
+            map.fitBounds(isMobile ? parisBoundsMobile : parisBounds, { padding: 20 });
         };
 
         this._container.appendChild(button);
@@ -414,8 +416,9 @@ function initMap() {
     map.addControl(new RecenterControl(), 'bottom-right');
     map.addControl(new LocateControl(), 'bottom-right');
 
-    // Fit to Paris bounds
-    map.fitBounds(parisBounds, { padding: 20 });
+    // Fit to Paris bounds (tighter on mobile)
+    const isMobile = window.innerWidth <= 768;
+    map.fitBounds(isMobile ? parisBoundsMobile : parisBounds, { padding: 20 });
 
     // Load data and add layers when map is ready
     map.on('load', loadDataAndAddLayers);
