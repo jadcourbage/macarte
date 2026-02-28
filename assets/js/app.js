@@ -791,10 +791,12 @@ function getAutocompleteConfig() {
     return {
         source: function(request, response) {
             $.ajax({
-                url: "https://api-adresse.data.gouv.fr/search/",
+                url: "https://data.geopf.fr/geocodage/search",
                 dataType: "json",
                 data: {
-                    'q': request.term + ' Paris',
+                    'q': request.term,
+                    'index': 'address',
+                    'citycode': '75056',
                     'limit': 5
                 },
                 success: function(data) {
