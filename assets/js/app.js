@@ -787,10 +787,13 @@ function setupHoverHandlers() {
 }
 
 // Address search autocomplete configuration
+let _geocodeTimer = null;
+
 function getAutocompleteConfig() {
     return {
         source: function(request, response) {
-            $.ajax({
+            clearTimeout(_geocodeTimer);
+            _geocodeTimer = setTimeout(function() { $.ajax({
                 url: "https://data.geopf.fr/geocodage/search",
                 dataType: "json",
                 data: {
@@ -812,7 +815,7 @@ function getAutocompleteConfig() {
 
                     response(arr);
                 }
-            });
+            }); }, 250);
         },
         minLength: 3,
         select: function(event, ui) {
