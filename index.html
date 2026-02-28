@@ -60,69 +60,6 @@
 </head>
 
 <body>
-  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container-fluid">
-      <div class="navbar-header">
-        <div class="navbar-icon-container">
-          <a href="#" class="navbar-icon pull-right visible-xs" id="nav-btn"><i class="fa fa-bars fa-lg white"></i></a>
-        </div>
-        <a class="navbar-brand" href="#" style="font-family:Tahoma, sans-serif;font-size: 16px;">CarteScolaire.paris
-          (2025-2026)</a>
-      </div>
-      <div class="navbar-collapse collapse">
-        <form class="navbar-form navbar-right" role="search">
-          <div class="form-group has-feedback">
-            <input id="searchbox" type="text" placeholder="Adresse ..." class="form-control">
-            <span id="searchicon" class="fa fa-search form-control-feedback"></span>
-          </div>
-
-        </form>
-        <ul class="nav navbar-nav">
-          <li class="dropdown">
-            <a id="collegesDrop" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i
-                class="fa fa-graduation-cap"></i>&nbsp;&nbsp;Collèges <b class="caret"></b></a>
-            <ul class="dropdown-menu">
-              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="secteurs"
-                  id="colleges-secto-btn"><i class="fa fa-map-o"></i>&nbsp;&nbsp;Carte scolaire</a></li>
-              <li class="divider hidden-xs"></li>
-              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer"
-                  id="colleges-btn"><i class="fa fa-circle blue"></i>&nbsp;&nbsp;Collèges</a></li>
-              <li class="divider hidden-xs"></li>
-              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="secteurs"
-                  id="colleges-txreu-btn"><i class="fa fa-percent"></i>&nbsp;&nbsp;Taux de réussite au Brevet</a></li>
-              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="secteurs"
-                  id="colleges-txmention-btn"><i class="fa fa-percent"></i>&nbsp;&nbsp;Taux de mention au Brevet</a>
-              </li>
-            </ul>
-          </li>
-          <li class="dropdown">
-            <a id="lyceesDrop" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i
-                class="fa fa-university"></i>&nbsp;&nbsp;Lycées <b class="caret"></b></a>
-            <ul class="dropdown-menu">
-              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer"
-                  id="lycees-eg-btn"><i class="fa fa-circle red"></i>&nbsp;&nbsp;Lycées d'enseignement général</a></li>
-              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer"
-                  id="lycees-tech-btn"><i class="fa fa-circle green"></i>&nbsp;&nbsp;Lycées d'enseignement
-                  technologique</a></li>
-              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer"
-                  id="lycees-eg-tech-btn"><i class="fa fa-circle orange"></i>&nbsp;&nbsp;Lycées d'enseignement général
-                  et technologique</a></li>
-              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer"
-                  id="lycees-poly-btn"><i class="fa fa-circle violet"></i>&nbsp;&nbsp;Lycées polyvalents</a></li>
-              <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" class="layer"
-                  id="lycees-pro-btn"><i class="fa fa-circle yellow"></i>&nbsp;&nbsp;Lycées professionels</a></li>
-            </ul>
-          </li>
-          <li><a href="#" data-toggle="collapse" data-target=".navbar-collapse.in" id="about-btn"><i
-                class="fa fa-question-circle "></i>&nbsp;&nbsp;A propos</a></li>
-        </ul>
-
-      </div>
-      <!--/.navbar-collapse -->
-
-    </div>
-  </div>
-
   <!-- Mobile search bar - visible only on mobile -->
   <div id="mobile-search" class="visible-xs">
     <div class="mobile-search-wrapper">
@@ -172,18 +109,17 @@
           <div class="tab-content" id="aboutTabsContent">
             <div class="tab-pane fade active in" id="pres">
               <p><b>Carte interactive des collèges et lycées de Paris.</b> </br> </br>
-                Les menus <b>Collèges</b> et <b>Lycées</b> permettent de sélectionner une visualisation : </br> </br>
+                Cliquez sur l'icône <i class="fa fa-map"></i> <b>Couches</b> (en haut à droite) pour sélectionner une visualisation : </br> </br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Liste et localisation des collèges et des lycées</br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Carte scolaire / sectorisation des collèges</br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Carte des résultats au Brevet des collèges</br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Carte des taux de mention au Brevet des collèges.</br> </br>
-                Vous pouvez <b>superposer</b> les visualisations en sélectionnant plusieurs élements <br>
+                Vous pouvez <b>superposer</b> les visualisations en sélectionnant plusieurs éléments <br>
                 (par exemple carte scolaire des collèges + lycées d'enseignement général et technologique)<br><br>
-                Les <b>icônes</b> en bas à droite permettent de naviguer plus aisément dans la carte :<br><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i
-                  class="fa fa-location-arrow"></i>&nbsp;&nbsp;&nbsp;Géolocalisation<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="glyphicon glyphicon-resize-full"></i>&nbsp;&nbsp;&nbsp;Vue
-                globale de Paris<br>
+                Les <b>icônes</b> en haut et en bas à droite permettent de naviguer dans la carte :<br><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-map"></i>&nbsp;&nbsp;&nbsp;Couches (sélection des visualisations)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-location-arrow"></i>&nbsp;&nbsp;&nbsp;Géolocalisation<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="glyphicon glyphicon-resize-full"></i>&nbsp;&nbsp;&nbsp;Vue globale de Paris<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;Zoom avant<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-minus"></i>&nbsp;&nbsp;&nbsp;Zoom arrière<br><br>
                 Vous pouvez identifier le collège auquel vous êtes rattachés en tapant votre adresse dans le <b>moteur

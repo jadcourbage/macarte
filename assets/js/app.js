@@ -76,21 +76,19 @@ function toggleMenu(item) {
 // Initialize menu states
 function initMenuState() {
     if (!isMobile()) {
-        $('#colleges-btn').data('selected', true);
+        selectMenu('#colleges-btn');
     } else {
-        $('#colleges-btn').data('selected', false);
-        $('#colleges-btn').css(notSelectedFormat);
+        unselectMenu('#colleges-btn');
     }
 
-    $('#colleges-secto-btn').data('selected', true);
-    $('#colleges-txreu-btn').data('selected', false);
-    $('#colleges-txmention-btn').data('selected', false);
-    $('#lycees-secto-btn').data('selected', false);
-    $('#lycees-eg-btn').data('selected', false);
-    $('#lycees-tech-btn').data('selected', false);
-    $('#lycees-eg-tech-btn').data('selected', false);
-    $('#lycees-poly-btn').data('selected', false);
-    $('#lycees-pro-btn').data('selected', false);
+    selectMenu('#colleges-secto-btn');
+    unselectMenu('#colleges-txreu-btn');
+    unselectMenu('#colleges-txmention-btn');
+    unselectMenu('#lycees-eg-btn');
+    unselectMenu('#lycees-tech-btn');
+    unselectMenu('#lycees-eg-tech-btn');
+    unselectMenu('#lycees-poly-btn');
+    unselectMenu('#lycees-pro-btn');
 }
 
 // Generate HTML content for college popup
@@ -402,6 +400,131 @@ class LocateControl {
     }
 }
 
+// Layer panel control
+class LayerControl {
+    onAdd(map) {
+        this._map = map;
+        this._container = document.createElement('div');
+        this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+
+        const button = document.createElement('button');
+        button.className = 'maplibregl-ctrl-icon';
+        button.type = 'button';
+        button.title = 'Couches';
+        button.innerHTML = '<i class="fa fa-map" style="font-size: 14px; line-height: 29px;"></i>';
+
+        const panel = document.createElement('div');
+        panel.id = 'layer-panel';
+        panel.style.display = 'none';
+        panel.innerHTML = `
+            <div class="layer-sheet-handle"></div>
+            <button class="layer-sheet-close" aria-label="Fermer">&times;</button>
+            <div class="layer-section-title">Collèges</div>
+            <a href="#" id="colleges-btn" class="layer-item"><i class="fa fa-circle blue"></i>&nbsp; Collèges (marqueurs)</a>
+            <a href="#" id="colleges-secto-btn" class="layer-item"><i class="fa fa-map-o"></i>&nbsp; Carte scolaire</a>
+            <a href="#" id="colleges-txreu-btn" class="layer-item"><i class="fa fa-percent"></i>&nbsp; Taux de réussite au Brevet</a>
+            <a href="#" id="colleges-txmention-btn" class="layer-item"><i class="fa fa-percent"></i>&nbsp; Taux de mention au Brevet</a>
+            <div class="layer-divider"></div>
+            <div class="layer-section-title">Lycées</div>
+            <a href="#" id="lycees-eg-btn" class="layer-item"><i class="fa fa-circle red"></i>&nbsp; Enseignement général</a>
+            <a href="#" id="lycees-tech-btn" class="layer-item"><i class="fa fa-circle green"></i>&nbsp; Enseignement technologique</a>
+            <a href="#" id="lycees-eg-tech-btn" class="layer-item"><i class="fa fa-circle orange"></i>&nbsp; Gén. &amp; Technologique</a>
+            <a href="#" id="lycees-poly-btn" class="layer-item"><i class="fa fa-circle violet"></i>&nbsp; Polyvalents</a>
+            <a href="#" id="lycees-pro-btn" class="layer-item"><i class="fa fa-circle yellow"></i>&nbsp; Professionnels</a>
+        `;
+
+        const backdrop = document.createElement('div');
+        backdrop.id = 'layer-panel-backdrop';
+        document.body.appendChild(backdrop);
+        this._backdrop = backdrop;
+
+        const showPanel = () => {
+            if (isMobile()) {
+                panel.classList.add('open');
+                backdrop.classList.add('open');
+            } else {
+                panel.style.display = 'block';
+            }
+        };
+
+        const hidePanel = () => {
+            if (isMobile()) {
+                panel.classList.remove('open');
+                backdrop.classList.remove('open');
+            } else {
+                panel.style.display = 'none';
+            }
+        };
+
+        const isPanelOpen = () => isMobile()
+            ? panel.classList.contains('open')
+            : panel.style.display !== 'none';
+
+        button.onclick = (e) => {
+            e.stopPropagation();
+            isPanelOpen() ? hidePanel() : showPanel();
+        };
+
+        backdrop.onclick = () => hidePanel();
+
+        panel.querySelector('.layer-sheet-close').addEventListener('click', (e) => {
+            e.preventDefault();
+            hidePanel();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!isMobile() && !this._container.contains(e.target) && !panel.contains(e.target)) {
+                hidePanel();
+            }
+        });
+
+        this._container.appendChild(button);
+        map.getContainer().appendChild(panel);
+        this._panel = panel;
+        this._hidePanel = hidePanel;
+
+        initMenuState();
+        return this._container;
+    }
+
+    onRemove() {
+        this._container.parentNode.removeChild(this._container);
+        if (this._panel && this._panel.parentNode) {
+            this._panel.parentNode.removeChild(this._panel);
+        }
+        if (this._backdrop && this._backdrop.parentNode) {
+            this._backdrop.parentNode.removeChild(this._backdrop);
+        }
+        this._map = undefined;
+    }
+}
+
+// About modal control
+class AboutControl {
+    onAdd(map) {
+        this._map = map;
+        this._container = document.createElement('div');
+        this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+
+        const button = document.createElement('button');
+        button.className = 'maplibregl-ctrl-icon';
+        button.type = 'button';
+        button.title = 'A propos';
+        button.innerHTML = '<i class="fa fa-question-circle" style="font-size: 14px; line-height: 29px;"></i>';
+        button.onclick = () => {
+            $('#aboutModal').modal('show');
+        };
+
+        this._container.appendChild(button);
+        return this._container;
+    }
+
+    onRemove() {
+        this._container.parentNode.removeChild(this._container);
+        this._map = undefined;
+    }
+}
+
 // Initialize the map
 function initMap() {
     map = new maplibregl.Map({
@@ -415,6 +538,8 @@ function initMap() {
     map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
     map.addControl(new RecenterControl(), 'bottom-right');
     map.addControl(new LocateControl(), 'bottom-right');
+    map.addControl(new LayerControl(), 'top-right');
+    map.addControl(new AboutControl(), 'top-right');
 
     // Fit to Paris bounds (tighter on mobile)
     const isMobile = window.innerWidth <= 768;
@@ -993,20 +1118,6 @@ function setupAddressSearch() {
 
 // Event handlers setup
 function setupEventHandlers() {
-    // About modal
-    $("#about-btn").click(function() {
-        $("#aboutModal").modal("show");
-        $(".navbar-collapse.in").collapse("hide");
-        return false;
-    });
-
-    // Prevent dropdown from closing on click (desktop only)
-    $('.dropdown-menu').on('click', function(event) {
-        if (!isMobile()) {
-            event.stopPropagation();
-        }
-    });
-
     // College layers
     $('#colleges-btn').click(function() {
         toggleColleges();
@@ -1036,17 +1147,6 @@ function setupEventHandlers() {
 
     $('#lycees-pro-btn').click(function() {
         toggleLyceesPro();
-    });
-
-    // Lycée sectors
-    $('#lycees-secto-btn').click(function() {
-        toggleSecteursLyc(this);
-    });
-
-    // Nav toggle
-    $("#nav-btn").click(function() {
-        $(".navbar-collapse").collapse("toggle");
-        return false;
     });
 
     // Search box handlers (desktop and mobile)
@@ -1084,7 +1184,6 @@ function setupEventHandlers() {
 
 // Initialize everything when DOM is ready
 $(document).ready(function() {
-    initMenuState();
     initMap();
     setupAddressSearch();
     setupEventHandlers();
