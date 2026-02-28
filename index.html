@@ -125,7 +125,10 @@
 
   <!-- Mobile search bar - visible only on mobile -->
   <div id="mobile-search" class="visible-xs">
-    <input id="searchbox-mobile" type="text" placeholder="Rechercher une adresse..." class="form-control">
+    <div class="mobile-search-wrapper">
+      <input id="searchbox-mobile" type="text" placeholder="Rechercher une adresse..." class="form-control">
+      <button id="clear-mobile" class="search-clear-btn hidden" title="Effacer">×</button>
+    </div>
   </div>
 
   <!-- Desktop search panel - Google Maps style -->
@@ -134,6 +137,7 @@
       <div class="search-input-wrapper">
         <i class="fa fa-search search-icon"></i>
         <input id="searchbox-desktop" type="text" placeholder="Rechercher une adresse..." class="search-input">
+        <button id="clear-desktop" class="search-clear-btn hidden" title="Effacer">×</button>
       </div>
     </div>
   </div>
@@ -191,7 +195,7 @@
                 <ul class="list-group">
                   <li class="list-group-item"><a href="https://maplibre.org" target="_blank">MapLibre GL JS</a> : librairie
                     de cartographie interactive </li>
-                  <li class="list-group-item"><a href="hhttps://adresse.data.gouv.fr/api"
+                  <li class="list-group-item"><a href="https://adresse.data.gouv.fr/api"
                       target="_blank">adresse.data.gouv.fr</a> : API de géocodage des adresses françaises (données Base
                     Adresse Nationale)</li>
                   <li class="list-group-item"><a href="https://maps.openrouteservice.org"
