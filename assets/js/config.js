@@ -2,9 +2,8 @@
 
 // Global state
 let map;
-let collegesData = null;
-let lyceesData = null;
-let lycSecsData = null;
+let schoolsData = null;   // keyed by UAI
+let sectorsData = null;   // college sector GeoJSON (polygons only)
 let activePopups = [];
 let activeRoutes = [];
 let activeMarkers = [];

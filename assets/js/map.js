@@ -1,5 +1,82 @@
 // CarteScolaire.paris — Map initialization, data loading, and event handlers
 
+// Precomputed 20-step YlGnBu gradient: yellow (low) → dark blue (high)
+const REUSSITE_GRADIENT = [
+    '#ffffd9','#f7fcc8','#f0f9b7','#e3f4b2','#d3eeb3',
+    '#bfe6b5','#a1dab8','#83cebb','#68c5be','#4ebbc2',
+    '#39aec3','#2a9fc1','#1d8ebf','#1f79b5','#2163ab',
+    '#2351a2','#243f99','#20308b','#142771','#081d58'
+];
+
+const ZONE_COLORS = [
+    '#80b1d3','#8dd3c7','#b3de69','#bc80bd','#bebada',
+    '#ccebc5','#d9d9d9','#fb8072','#fccde5','#fdb462',
+    '#ffed6f','#ffffb3','#aec6cf','#b5e7a0','#f4a460',
+    '#c9b1d9','#87ceeb','#f0e68c'
+];
+
+function percentileRank(value, values) {
+    const sorted = [...values].sort((a, b) => a - b);
+    const below = sorted.filter(v => v < value).length;
+    const equal = sorted.filter(v => v === value).length;
+    return (below + equal * 0.5) / sorted.length * 100;
+}
+
+function rateToColor(rate, allRates, gradient) {
+    const pct = percentileRank(rate, allRates);
+    return gradient[Math.min(gradient.length - 1, Math.floor((pct - 0.001) / 5))];
+}
+
+// Seeded LCG for deterministic zone color assignment (same seed as legacy pipeline)
+function seededRandom(seed) {
+    let s = seed;
+    return () => {
+        s = (s * 1664525 + 1013904223) & 0xffffffff;
+        return (s >>> 0) / 0xffffffff;
+    };
+}
+
+function computeSectorColors(sectorsGeoJSON, schools) {
+    const colleges = Object.values(schools).filter(s => s.nature_uai === 340 && s.txreussite != null);
+    const allReussite = colleges.map(s => s.txreussite);
+    const allMention  = colleges.map(s => s.txmention);
+    const rng = seededRandom(1234);
+
+    sectorsGeoJSON.features.forEach(f => {
+        const uais = f.properties.uais;
+        const etabs = uais.map(u => schools[u]).filter(Boolean);
+        const count = etabs.filter(e => e.txreussite != null).length;
+
+        const txr = count > 0
+            ? etabs.filter(e => e.txreussite != null).reduce((s, e) => s + e.txreussite, 0) / count
+            : 0;
+        const txm = count > 0
+            ? etabs.filter(e => e.txmention  != null).reduce((s, e) => s + e.txmention,  0) / count
+            : 0;
+
+        f.properties.colzone     = ZONE_COLORS[Math.floor(rng() * ZONE_COLORS.length)];
+        f.properties.colreussite = allReussite.length > 0 ? rateToColor(txr, allReussite, REUSSITE_GRADIENT) : '#cccccc';
+        f.properties.colmention  = allMention.length  > 0 ? rateToColor(txm, allMention,  REUSSITE_GRADIENT) : '#cccccc';
+    });
+}
+
+function buildPointsGeoJSON(natureUaiCodes) {
+    return {
+        type: 'FeatureCollection',
+        features: Object.entries(schoolsData)
+            .filter(([, s]) => natureUaiCodes.includes(s.nature_uai))
+            .map(([uai, s]) => ({
+                type: 'Feature',
+                geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
+                properties: {
+                    uai,
+                    nature_uai: s.nature_uai,
+                    secteur_public_prive_libe: s.secteur_public_prive_libe
+                }
+            }))
+    };
+}
+
 // Initialize the map
 function initMap() {
     map = new maplibregl.Map({
@@ -27,26 +104,33 @@ function initMap() {
 // Load GeoJSON data and add layers
 async function loadDataAndAddLayers() {
     try {
-        // Load all GeoJSON data
-        const [collegesResponse, lyceesResponse, lycSecsResponse] = await Promise.all([
-            fetch('data/colleges.geojson'),
-            fetch('data/lycees.geojson'),
-            fetch('data/secteurs_lyc.geojson')
+        const [sectorsRes, lycSecsRes, schoolsRes] = await Promise.all([
+            fetch('data/colleges_sectors.geojson'),
+            fetch('data/secteurs_lyc.geojson'),
+            fetch('data/schools_data.json')
         ]);
 
-        collegesData = await collegesResponse.json();
-        lyceesData = await lyceesResponse.json();
-        lycSecsData = await lycSecsResponse.json();
+        sectorsData = await sectorsRes.json();
+        const lycSecsData = await lycSecsRes.json();
+        schoolsData = await schoolsRes.json();
+
+        // Compute and inject sector colors at runtime
+        computeSectorColors(sectorsData, schoolsData);
 
         // Add sources
         map.addSource('colleges', {
             type: 'geojson',
-            data: collegesData
+            data: sectorsData
+        });
+
+        map.addSource('college-points', {
+            type: 'geojson',
+            data: buildPointsGeoJSON([340])
         });
 
         map.addSource('lycees', {
             type: 'geojson',
-            data: lyceesData
+            data: buildPointsGeoJSON([300, 301, 302, 306, 320])
         });
 
         map.addSource('lycSecteurs', {
@@ -127,8 +211,8 @@ async function loadDataAndAddLayers() {
         map.addLayer({
             id: 'colleges-points',
             type: 'circle',
-            source: 'colleges',
-            filter: ['==', ['geometry-type'], 'Point'],
+            source: 'college-points',
+            filter: ['==', ['get', 'secteur_public_prive_libe'], 'Public'],
             paint: {
                 'circle-radius': 6,
                 'circle-color': COLORS.college,
@@ -239,7 +323,7 @@ async function loadDataAndAddLayers() {
         });
 
         // Add click handlers
-        setupClickHandlers();
+        setupClickHandlers(lycSecsData);
 
         // Add cursor change on hover
         setupHoverHandlers();
@@ -250,20 +334,22 @@ async function loadDataAndAddLayers() {
 }
 
 // Setup click handlers for layers
-function setupClickHandlers() {
+function setupClickHandlers(lycSecsData) {
     // Click on college sector
     map.on('click', 'colSecteurs-fill', (e) => {
         if (e.features.length === 0) return;
 
         const feature = e.features[0];
 
-        const etabs = typeof feature.properties.etabs === 'string'
-            ? JSON.parse(feature.properties.etabs)
-            : feature.properties.etabs;
+        const uais = typeof feature.properties.uais === 'string'
+            ? JSON.parse(feature.properties.uais)
+            : feature.properties.uais;
+
+        const etabs = uais.map(uai => schoolsData[uai]).filter(Boolean);
 
         // Use original GeoJSON geometry (click event geometry may be clipped to tile boundaries)
-        const fullFeature = collegesData.features.find(f =>
-            f.geometry.type === 'MultiPolygon' && f.properties.etabs[0].nom === etabs[0].nom);
+        const fullFeature = sectorsData.features.find(f =>
+            f.properties.uais && f.properties.uais[0] === uais[0]);
         const geom = fullFeature ? fullFeature.geometry : feature.geometry;
         const coordinates = geom.coordinates.flat(2);
         const bounds = coordinates.reduce((bounds, coord) => {
@@ -311,13 +397,16 @@ function setupClickHandlers() {
         const feature = e.features[0];
         const props = feature.properties;
         const coords = feature.geometry.coordinates;
+        const school = schoolsData[props.uai];
+
+        if (!school) return;
 
         // Clear previous popups
         clearPopups();
 
         const popup = new maplibregl.Popup()
             .setLngLat(coords)
-            .setHTML(infoCol(props.nom, props.adresse, props.code_postal, props.txreussite, props.txmention))
+            .setHTML(infoCol(school.nom, school.adresse, school.code_postal, school.txreussite, school.txmention))
             .addTo(map);
 
         activePopups.push(popup);
@@ -333,13 +422,16 @@ function setupClickHandlers() {
             const feature = e.features[0];
             const props = feature.properties;
             const coords = feature.geometry.coordinates;
+            const school = schoolsData[props.uai];
+
+            if (!school) return;
 
             // Clear previous popups
             clearPopups();
 
             const popup = new maplibregl.Popup()
                 .setLngLat(coords)
-                .setHTML(infoLyc(props.patronyme_uai, props.adresse_uai, props.code_postal_uai, props.nature_uai_libe))
+                .setHTML(infoLyc(school.nom, school.adresse, school.code_postal, school.nature_uai_libe))
                 .addTo(map);
 
             activePopups.push(popup);

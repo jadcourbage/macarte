@@ -48,7 +48,7 @@ function getAutocompleteConfig() {
             const lat = ui.item.lat;
 
             // Find the sector containing this point
-            const matchingSector = findSectorForPoint(lng, lat, collegesData);
+            const matchingSector = findSectorForPoint(lng, lat);
 
             if (matchingSector) {
                 // Create marker at search location
@@ -68,9 +68,7 @@ function getAutocompleteConfig() {
 
                 activeMarkers.push(locationMarker);
 
-                const etabs = typeof matchingSector.properties.etabs === 'string'
-                    ? JSON.parse(matchingSector.properties.etabs)
-                    : matchingSector.properties.etabs;
+                const etabs = matchingSector.properties.uais.map(uai => schoolsData[uai]).filter(Boolean);
 
                 // Get walking routes for each school and fit bounds to routes
                 const routeBounds = new maplibregl.LngLatBounds();

@@ -170,15 +170,13 @@ function toggleSecteursLyc(item) {
     }
 }
 
-// Find sector containing a point using Turf.js
-function findSectorForPoint(lng, lat, geojsonData) {
+// Find college sector containing a point using Turf.js
+function findSectorForPoint(lng, lat) {
     const point = turf.point([lng, lat]);
 
-    for (const feature of geojsonData.features) {
-        if (feature.geometry.type === 'MultiPolygon' || feature.geometry.type === 'Polygon') {
-            if (turf.booleanPointInPolygon(point, feature)) {
-                return feature;
-            }
+    for (const feature of sectorsData.features) {
+        if (turf.booleanPointInPolygon(point, feature)) {
+            return feature;
         }
     }
     return null;

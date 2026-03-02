@@ -1,14 +1,12 @@
 import json
 import os
-import random
 import re
+import urllib.request
 import warnings
 from urllib.parse import urlencode
 
 import geopandas as gpd
 import pandas as pd
-from colour import Color
-from scipy import stats
 from unidecode import unidecode
 
 
@@ -80,37 +78,6 @@ def clean_nom(string):
     return string
 
 
-def merge_college_paris_educnat(df_paris, df_educnat):
-    """Réalise la jointure entre les dataframes de la Ville de Paris et de l'Éducation Nationale.
-
-    Le dataframe de la Ville de Paris contient les noms, adresses et géolocalisations des collèges.
-    Le dataframe de l'Éducation Nationale contient les taux de réussite au brevet des collèges.
-
-    La jointure est réalisée via un fichier de mapping CSV (uai_mapping.csv) qui associe
-    les noms des collèges parisiens à leur code UAI.
-    """
-    uai_mapping = load_uai_mapping()
-    df_paris["code"] = df_paris.nom.map(uai_mapping)
-
-    missing = df_paris[df_paris.code.isna()]
-    for nom in missing.nom:
-        warnings.warn(f'Pas de code UAI pour "{nom}" dans uai_mapping.csv')
-
-    merged = pd.merge(df_paris, df_educnat, on="code", how="left")
-    fill_cols = ["txreussite", "txmention", "Presents", "Admis", "Admis sans mention"]
-    for col in fill_cols:
-        if col in merged.columns:
-            merged[col] = merged[col].fillna(0)
-    return merged
-
-
-def prepro_df_paris_etab(df):
-    """Preprocessing de la dataframe d'établissements issue du dataset de la Ville de Paris."""
-    df["code_postal"] = df["arr_insee"].apply(lambda x: str(x).replace("751", "750"))
-    df["nom"] = df["libelle"]
-    return df
-
-
 def prepro_df_educnat(df):
     """Preprocessing de la dataframe issue du dataset de l'Éducation Nationale."""
     df["txreussite"] = round(df["Taux de réussite G"], ndigits=1)
@@ -128,93 +95,101 @@ def prepro_df_educnat(df):
     return df
 
 
-def prepro_df_paris_secto(df_secto, df_etab):
-    """Preprocessing de la dataframe de sectorisation de collèges issue du dataset de la Ville de Paris.
+def get_all_paris_schools():
+    """Fetch all Paris schools from the national API.
 
-    Les secteurs scolaires peuvent être liés à plus d'un établissement (maximum 4). Pour cela, nous stockons
-    dans la dataframe de sortie une liste d'établissements dans la colonne `etabs`.
-
-    Les propriétés telles que taux de réussite et de mention au brevet pour un secteur scolaire sont la moyenne
-    de ces propriétés pour tous les établissements qui y sont rattachés.
+    Returns:
+        dict: keyed by UAI code (str), values are dicts with school info.
     """
+    base_url = "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/"
+    dataset = "fr-en-adresse-et-geolocalisation-etablissements-premier-et-second-degre"
+    select_fields = (
+        "numero_uai,patronyme_uai,adresse_uai,code_postal_uai,"
+        "nature_uai,nature_uai_libe,secteur_public_prive_libe,latitude,longitude"
+    )
 
-    def _get_etabs(row_secto, df_etab):
-        etabs = []
-        for i in [1, 2, 3, 4]:
-            nom = row_secto[f"lib_etab_{i}"]
-            if pd.isna(nom):
-                continue
-            etab = df_etab[df_etab.nom == nom].iloc[0]
-            etabs.append(etab)
-        return etabs
+    schools = {}
+    offset = 0
+    limit = 100
 
-    df_secto["etabs"] = ""
-    for index, row_secto in df_secto.iterrows():
-        etabs = _get_etabs(row_secto, df_etab)
-
-        presents = 0
-        admis = 0
-        admis_no_mention = 0
-        for etab in etabs:
-            presents += etab["Presents"]
-            admis += etab["Admis"]
-            admis_no_mention += etab["Admis sans mention"]
-
-        df_secto.loc[index, "txreussite"] = round(100 * admis / presents, ndigits=1)
-        df_secto.loc[index, "txmention"] = round(
-            100 * (admis - admis_no_mention) / presents, ndigits=1
-        )
-
-        # Utilisation de `df.at[]` au lieu de `df.loc[]` ici à cause d'un comportement obscur de pandas,
-        # cf https://stackoverflow.com/a/71686858
-        df_secto.at[index, "etabs"] = [
-            {
-                "nom": etab.nom,
-                "adresse": etab.adresse,
-                "code_postal": etab.code_postal,
-                "lng": etab.geometry.x,
-                "lat": etab.geometry.y,
-                "txreussite": etab.txreussite,
-                "txmention": etab.txmention,
-            }
-            for etab in etabs
+    while True:
+        payload = [
+            ("where", 'code_departement="075"'),
+            ("select", select_fields),
+            ("limit", limit),
+            ("offset", offset),
         ]
+        url = f"{base_url}/{dataset}/records?{urlencode(payload)}"
+        print(f"Fetching schools: offset={offset} — {url}")
 
-    # Assignation d'une couleur en fonction des taux
-    gradient = [el.get_hex() for el in Color("#FAEB6E").range_to("#1A2E38", 20)]
+        with urllib.request.urlopen(url) as resp:
+            data = json.load(resp)
 
-    def _taux_to_color(taux, taux_series):
-        rank = stats.percentileofscore(taux_series, taux, kind="weak")
-        color = gradient[int((rank - 0.001) / 5)]
-        return color
+        for record in data["results"]:
+            uai = record.get("numero_uai")
+            if not uai:
+                continue
+            lat = record.get("latitude")
+            lng = record.get("longitude")
+            schools[uai] = {
+                "nom": record.get("patronyme_uai"),
+                "adresse": record.get("adresse_uai"),
+                "code_postal": str(record.get("code_postal_uai", "")),
+                "nature_uai": record.get("nature_uai"),
+                "nature_uai_libe": record.get("nature_uai_libe"),
+                "secteur_public_prive_libe": record.get("secteur_public_prive_libe"),
+                "lat": round(float(lat), 5) if lat is not None else None,
+                "lng": round(float(lng), 5) if lng is not None else None,
+            }
 
-    df_secto["colreussite"] = df_secto.txreussite.apply(
-        lambda tx: _taux_to_color(tx, df_etab.txreussite)
+        total = data.get("total_count", 0)
+        offset += limit
+        if offset >= total:
+            break
+
+    print(f"Fetched {len(schools)} schools total")
+    return schools
+
+
+def merge_brevet_results(schools):
+    """Ajoute les taux de réussite et de mention au brevet pour les collèges.
+
+    Args:
+        schools (dict): keyed by UAI, modified in place.
+
+    Returns:
+        dict: same dict with txreussite/txmention added to college entries.
+    """
+    df_educnat = get_colleges_reussite_brevet()
+    df_educnat = prepro_df_educnat(df_educnat)
+
+    brevet_by_uai = (
+        df_educnat.set_index("code")[["txreussite", "txmention"]]
+        .to_dict("index")
     )
-    df_secto["colmention"] = df_secto.txmention.apply(
-        lambda tx: _taux_to_color(tx, df_etab.txmention)
-    )
 
-    zone_colors = [
-        "#80b1d3",
-        "#8dd3c7",
-        "#b3de69",
-        "#bc80bd",
-        "#bebada",
-        "#ccebc5",
-        "#d9d9d9",
-        "#fb8072",
-        "#fccde5",
-        "#fdb462",
-        "#ffed6f",
-        "#ffffb3",
-    ]
-    random.seed(1234)  # On fixe une seed afin d'avoir toujours le même résultat
-    # Affectation aléatoire d'une couleur de la liste à chacune des zones
-    df_secto["colzone"] = random.choices(zone_colors, k=len(df_secto))
+    for uai, school in schools.items():
+        if school.get("nature_uai") == 340:  # collège
+            if uai in brevet_by_uai:
+                school["txreussite"] = brevet_by_uai[uai]["txreussite"]
+                school["txmention"] = brevet_by_uai[uai]["txmention"]
+            else:
+                school["txreussite"] = 0
+                school["txmention"] = 0
 
-    cols_to_keep = ["colzone", "colreussite", "colmention", "geometry", "etabs"]
-    return df_secto[cols_to_keep]
+    return schools
+
+
+def write_schools_data(schools, path):
+    """Écrit le dict des écoles au format JSON.
+
+    Args:
+        schools (dict): keyed by UAI.
+        path (str): chemin de sortie.
+    """
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(schools, f, ensure_ascii=False)
+    print(f"Written {len(schools)} schools to {path}")
 
 
 def simplify_geoms_df(geoms, tolerance=3):
@@ -228,13 +203,6 @@ def simplify_geoms_df(geoms, tolerance=3):
     Returns:
         gpd.GeoSeries: géométries simplifiées
     """
-    # La méthode `simplify` de `geopandas` prend en entrée un valeur de `tolerance` dont la valeur est interprétée
-    # dans l'unité du système de coordonées des géométries passées.
-    # Il est plus naturel pour nous de raisonner en mètres, mais par défaut les géométries passées sont dans un
-    # système de coordonnées en degrés de longitude/latitude. Nous les convertissons donc d'abord dans la zone
-    # UTM locale — qui est un système de coordonnées en mètres
-    # cf https://en.wikipedia.org/wiki/Universal_Transverse_Mercator_coordinate_system — pour effectuer la
-    # simplification, avant de les re-convertir en longitude/latitude (== EPSG:4326)
     utm_crs = geoms.estimate_utm_crs()
     return geoms.to_crs(utm_crs).simplify(tolerance=tolerance).to_crs("EPSG:4326")
 
@@ -247,58 +215,72 @@ def limit_coordinate_precision(string):
     return re.sub(r"(\.[0-9]{5})[0-9]+", r"\1", string)
 
 
-def generate_geojson_colleges(id_projet, path):
-    df_paris_etab = get_paris_data_geojson(
-        dataset="etablissements-scolaires-colleges",
-        id_projet=id_projet,
-    )
-    df_paris_etab = prepro_df_paris_etab(df_paris_etab)
+def generate_geojson_college_sectors(id_projet, schools, path):
+    """Génère un GeoJSON de secteurs scolaires de collèges (polygones uniquement).
 
-    df_educnat = get_colleges_reussite_brevet()
-    df_educnat = prepro_df_educnat(df_educnat)
+    Chaque feature ne contient que la liste des UAI des établissements rattachés.
+    Les couleurs sont calculées côté JS au chargement de la carte.
 
-    df_etab = merge_college_paris_educnat(df_paris_etab, df_educnat)
-
+    Args:
+        id_projet (str): filtre opendata.paris.fr, ex: `COLLEGES (année scolaire 2025/2026)`
+        schools (dict): keyed by UAI (used only to warn on unmapped names)
+        path (str): chemin de sortie GeoJSON
+    """
     df_secto = get_paris_data_geojson(
         dataset="secteurs-scolaires-colleges",
         id_projet=id_projet,
     )
     df_secto["geometry"] = simplify_geoms_df(df_secto["geometry"])
-    df_secto = prepro_df_paris_secto(df_secto, df_etab)
 
-    cols_to_keep = [
-        "nom",
-        "adresse",
-        "code_postal",
-        "geometry",
-        "txreussite",
-        "txmention",
-    ]
-    df_etab = df_etab[cols_to_keep]
+    uai_mapping = load_uai_mapping()
 
-    # Idéalement, on aimerait utiliser `df_secto.to_file("myfile.geojson", COORDINATE_PRECISION=5)` directement
-    # pour sauver la dataframe sous format GeoJSON avec un nombre maîtrisé de chiffres après la virgule
-    # dans les coordonnées.
-    # Mais `df_secto` a une colone `etabs` qui contient une liste, et cela n'est pas géré par le driver GeoJSON
-    # de `geopandas`, cf https://github.com/geopandas/geopandas/issues/2113.
-    # On passe donc par un `.to_json()`, puis on tronque les chiffres après la virgule en utilisant une regex.
-    json_secto = json.loads(limit_coordinate_precision(df_secto.to_json()))
+    features = []
+    for _, row in df_secto.iterrows():
+        uais = []
+        for i in [1, 2, 3, 4]:
+            nom = row.get(f"lib_etab_{i}")
+            if nom is None or (isinstance(nom, float) and pd.isna(nom)):
+                continue
+            uai = uai_mapping.get(str(nom).strip())
+            if uai:
+                uais.append(uai)
+                if uai not in schools:
+                    warnings.warn(f'UAI "{uai}" ({nom}) absent de schools_data')
+            else:
+                warnings.warn(f'Pas de code UAI pour "{nom}" dans uai_mapping.csv')
 
-    json_etab = json.loads(limit_coordinate_precision(df_etab.to_json()))
+        if not uais:
+            continue
 
-    # On crée un GeoJSON contenant à la fois les établissements et les secteurs
-    json_all_features = {
-        "type": "FeatureCollection",
-        "features": json_secto["features"] + json_etab["features"],
-    }
-    with open(path, "w") as f:
-        json.dump(json_all_features, f)
+        geom = row.geometry.__geo_interface__
+        features.append({
+            "type": "Feature",
+            "properties": {"uais": uais},
+            "geometry": geom,
+        })
+
+    geojson = {"type": "FeatureCollection", "features": features}
+    json_str = limit_coordinate_precision(json.dumps(geojson))
+
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(json_str)
+
+    print(f"Written {len(features)} sector features to {path}")
 
 
 if __name__ == "__main__":
-    generate_geojson_colleges(
-        id_projet="COLLEGES (année scolaire 2025/2026)",
+    schools = get_all_paris_schools()
+    schools = merge_brevet_results(schools)
+    write_schools_data(
+        schools,
         path=os.path.realpath(
-            os.path.join(__file__, "..", "..", "data", "colleges.geojson")
+            os.path.join(__file__, "..", "..", "data", "schools_data.json")
+        ),
+    )
+    generate_geojson_college_sectors(
+        id_projet="COLLEGES (année scolaire 2025/2026)",
+        schools=schools,
+        path=os.path.realpath(
+            os.path.join(__file__, "..", "..", "data", "colleges_sectors.geojson")
         ),
     )
