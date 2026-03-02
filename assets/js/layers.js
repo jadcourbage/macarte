@@ -114,15 +114,10 @@ function toggleSecteurs(item) {
         hideLayer('colSecteurs-fill');
         hideLayer('colSecteurs-outline');
     } else {
-        // Hide lycée sectors
-        hideLayer('lycSecteurs-fill');
-        hideLayer('lycSecteurs-outline');
-
         if (item.id === 'colleges-secto-btn') {
             toggleMenu(item);
             unselectMenu(document.getElementById('colleges-txreu-btn'));
             unselectMenu(document.getElementById('colleges-txmention-btn'));
-            unselectMenu(document.getElementById('lycees-secto-btn'));
             showLayer('colSecteurs-fill');
             showLayer('colSecteurs-outline');
             setColSecteurStyle('zone');
@@ -132,7 +127,6 @@ function toggleSecteurs(item) {
             toggleMenu(item);
             unselectMenu(document.getElementById('colleges-secto-btn'));
             unselectMenu(document.getElementById('colleges-txmention-btn'));
-            unselectMenu(document.getElementById('lycees-secto-btn'));
             showLayer('colSecteurs-fill');
             showLayer('colSecteurs-outline');
             setColSecteurStyle('reussite');
@@ -142,31 +136,10 @@ function toggleSecteurs(item) {
             toggleMenu(item);
             unselectMenu(document.getElementById('colleges-secto-btn'));
             unselectMenu(document.getElementById('colleges-txreu-btn'));
-            unselectMenu(document.getElementById('lycees-secto-btn'));
             showLayer('colSecteurs-fill');
             showLayer('colSecteurs-outline');
             setColSecteurStyle('mention');
         }
-    }
-}
-
-// Toggle lycée sectors
-function toggleSecteursLyc(item) {
-    const selected = $(item).data('selected');
-
-    if (selected) {
-        toggleMenu(item);
-        hideLayer('lycSecteurs-fill');
-        hideLayer('lycSecteurs-outline');
-    } else {
-        toggleMenu(item);
-        unselectMenu(document.getElementById('colleges-secto-btn'));
-        unselectMenu(document.getElementById('colleges-txreu-btn'));
-        unselectMenu(document.getElementById('colleges-txmention-btn'));
-        hideLayer('colSecteurs-fill');
-        hideLayer('colSecteurs-outline');
-        showLayer('lycSecteurs-fill');
-        showLayer('lycSecteurs-outline');
     }
 }
 

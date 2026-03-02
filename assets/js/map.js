@@ -104,14 +104,12 @@ function initMap() {
 // Load GeoJSON data and add layers
 async function loadDataAndAddLayers() {
     try {
-        const [sectorsRes, lycSecsRes, schoolsRes] = await Promise.all([
+        const [sectorsRes, schoolsRes] = await Promise.all([
             fetch('data/colleges_sectors.geojson'),
-            fetch('data/secteurs_lyc.geojson'),
             fetch('data/schools_data.json')
         ]);
 
         sectorsData = await sectorsRes.json();
-        const lycSecsData = await lycSecsRes.json();
         schoolsData = await schoolsRes.json();
 
         // Compute and inject sector colors at runtime
@@ -131,11 +129,6 @@ async function loadDataAndAddLayers() {
         map.addSource('lycees', {
             type: 'geojson',
             data: buildPointsGeoJSON([300, 301, 302, 306, 320])
-        });
-
-        map.addSource('lycSecteurs', {
-            type: 'geojson',
-            data: lycSecsData
         });
 
         // Add college sector fill layer
@@ -166,44 +159,6 @@ async function loadDataAndAddLayers() {
                 'line-width': 1,
                 'line-dasharray': [3, 3],
                 'line-opacity': 0.5
-            }
-        });
-
-        // Add lycée sector fill layer (hidden initially)
-        map.addLayer({
-            id: 'lycSecteurs-fill',
-            type: 'fill',
-            source: 'lycSecteurs',
-            paint: {
-                'fill-color': [
-                    'match',
-                    ['get', 'secteur'],
-                    'ouest', '#b3de69',
-                    'est', '#80b1d3',
-                    'nord', '#fb8072',
-                    'sud', '#ffed6f',
-                    '#FFFFB2'
-                ],
-                'fill-opacity': 0.6
-            },
-            layout: {
-                visibility: 'none'
-            }
-        });
-
-        // Add lycée sector outline layer (hidden initially)
-        map.addLayer({
-            id: 'lycSecteurs-outline',
-            type: 'line',
-            source: 'lycSecteurs',
-            paint: {
-                'line-color': 'grey',
-                'line-width': 1,
-                'line-dasharray': [3, 3],
-                'line-opacity': 0.5
-            },
-            layout: {
-                visibility: 'none'
             }
         });
 
@@ -323,7 +278,7 @@ async function loadDataAndAddLayers() {
         });
 
         // Add click handlers
-        setupClickHandlers(lycSecsData);
+        setupClickHandlers();
 
         // Add cursor change on hover
         setupHoverHandlers();
@@ -334,7 +289,7 @@ async function loadDataAndAddLayers() {
 }
 
 // Setup click handlers for layers
-function setupClickHandlers(lycSecsData) {
+function setupClickHandlers() {
     // Click on college sector
     map.on('click', 'colSecteurs-fill', (e) => {
         if (e.features.length === 0) return;
@@ -438,18 +393,6 @@ function setupClickHandlers(lycSecsData) {
         });
     });
 
-    // Click on lycée sector
-    map.on('click', 'lycSecteurs-fill', (e) => {
-        if (e.features.length === 0) return;
-
-        const feature = e.features[0];
-        // Use original GeoJSON geometry (click event geometry may be clipped to tile boundaries)
-        const fullFeature = lycSecsData.features.find(f =>
-            f.properties.cartodb_id === feature.properties.cartodb_id);
-        const bounds = turf.bbox(fullFeature || feature);
-
-        map.fitBounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]], { padding: 50 });
-    });
 }
 
 // Setup hover handlers for cursor change
@@ -461,8 +404,7 @@ function setupHoverHandlers() {
         'lycees-tech',
         'lycees-eg-tech',
         'lycees-poly',
-        'lycees-pro',
-        'lycSecteurs-fill'
+        'lycees-pro'
     ];
 
     interactiveLayers.forEach(layerId => {
