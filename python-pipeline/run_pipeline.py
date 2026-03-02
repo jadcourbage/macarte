@@ -169,13 +169,9 @@ def merge_brevet_results(schools):
     )
 
     for uai, school in schools.items():
-        if school.get("nature_uai") == 340:  # collège
-            if uai in brevet_by_uai:
-                school["txreussite"] = brevet_by_uai[uai]["txreussite"]
-                school["txmention"] = brevet_by_uai[uai]["txmention"]
-            else:
-                school["txreussite"] = 0
-                school["txmention"] = 0
+        if uai in brevet_by_uai:
+            school["txreussite"] = brevet_by_uai[uai]["txreussite"]
+            school["txmention"] = brevet_by_uai[uai]["txmention"]
 
     return schools
 
