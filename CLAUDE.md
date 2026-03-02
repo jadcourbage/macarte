@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**CarteScolaire.paris** — An interactive map application for visualizing Paris school districts (collèges and lycées), including school locations, sector boundaries, and Brevet exam results (pass rates and distinction rates).
+**CarteScolaire.paris** — An interactive map application for visualizing Paris school districts (collèges and lycées), including school locations, sector boundaries, and exam results (Brevet for collèges, Bac for lycées).
 
 The site is a static website hosted at https://cartescolaire.netlify.app
 
@@ -20,7 +20,7 @@ The site is a static website hosted at https://cartescolaire.netlify.app
   - `ui.js`: Menu state helpers and popup HTML builders
   - `controls.js`: Custom MapLibre controls (recenter, locate, layer panel, about)
 - **data/**: Data files loaded at runtime
-  - `schools_data.json`: All Paris schools keyed by UAI — single source of truth for names, addresses, coordinates, and exam results
+  - `schools_data.json`: All Paris schools keyed by UAI — single source of truth for names, addresses, coordinates, and exam results (`txreussite`, `txmention` — Brevet for collèges, Bac for lycées; absent if no data)
   - `colleges_sectors.geojson`: College sector polygons only, each with a `uais` array referencing schools by UAI
 
 ### Data Pipeline (Python)
@@ -50,7 +50,8 @@ A local server is required because the app loads JSON/GeoJSON files via fetch.
 - **Address search**: Autocomplete geocoding identifies the college sector for an address
 - **College views**: Toggle between sector map, pass rate choropleth (YlGnBu), or distinction rate choropleth
 - **Lycée views**: Filter by school type (general, tech, polyvalent, professional)
-- **Sector click**: Shows popup with assigned school(s) and their Brevet results
+- **Sector click**: Shows popup with assigned school(s), school type, and exam results
+- **Point click**: Shows popup for individual school with type and exam results (Brevet for collèges, Bac for lycées)
 - **Walking route**: When searching an address, displays walking distance/time to assigned school(s)
 - **Geolocation**: Locate user position on map
 
@@ -58,7 +59,8 @@ A local server is required because the app loads JSON/GeoJSON files via fetch.
 
 ### Data Pipeline
 - `get_all_paris_schools()` paginates the national API (`fr-en-adresse-et-geolocalisation-etablissements-premier-et-second-degre`) to fetch all ~1297 Paris schools
-- `merge_brevet_results()` joins Brevet CSV results to college entries (nature_uai=340) by UAI code
+- `merge_brevet_results()` joins Brevet 2024 CSV (`fr-en-indicateurs-valeur-ajoutee-colleges`) to all colleges by UAI; schools with no data get no `txreussite`/`txmention` field
+- `merge_bac_results()` joins Bac 2024 results (`fr-en-indicateurs-de-resultat-des-lycees-gt_v2`, annee:2024, code_departement:75) to lycées by UAI; 106 Paris lycées covered
 - `generate_geojson_college_sectors()` uses `uai_mapping.csv` to map sector polygon school names → UAI codes; outputs polygons only (no Point features)
 - School year is configured via the `id_projet` parameter (e.g., `"COLLEGES (année scolaire 2025/2026)"`)
 - Geometry simplification reduces GeoJSON size while maintaining ~1m precision
@@ -73,6 +75,7 @@ A local server is required because the app loads JSON/GeoJSON files via fetch.
 - Point-in-polygon lookup uses `turf.booleanPointInPolygon()` for address search
 - Coordinates use `[lng, lat]` format (MapLibre convention)
 - College points filtered to `secteur_public_prive_libe === 'Public'`
+- Popups use `escapeHtml()` on all data fields; `formatSchoolType()` maps raw `nature_uai_libe` API values to human-readable French labels; `popupRates()` renders exam results section (omitted if no data)
 
 ## Browser Automation
 
