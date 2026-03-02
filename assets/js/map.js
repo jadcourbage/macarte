@@ -386,7 +386,7 @@ function setupClickHandlers() {
 
             const popup = new maplibregl.Popup()
                 .setLngLat(coords)
-                .setHTML(infoLyc(school.nom, school.adresse, school.code_postal, school.nature_uai_libe))
+                .setHTML(infoLyc(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention))
                 .addTo(map);
 
             activePopups.push(popup);

@@ -176,6 +176,53 @@ def merge_brevet_results(schools):
     return schools
 
 
+def merge_bac_results(schools):
+    """Ajoute les taux de réussite et de mention au Bac pour les lycées.
+
+    Args:
+        schools (dict): keyed by UAI, modified in place.
+
+    Returns:
+        dict: same dict with txreussite/txmention added to lycée entries.
+    """
+    base = ("https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets"
+            "/fr-en-indicateurs-de-resultat-des-lycees-gt_v2/records")
+
+    results = []
+    offset = 0
+    limit = 100
+    while True:
+        payload = [
+            ("refine", "annee:2024"),
+            ("refine", "code_departement:75"),
+            ("select", "uai,taux_reu_total,taux_men_total"),
+            ("limit", limit),
+            ("offset", offset),
+        ]
+        url = f"{base}?{urlencode(payload)}"
+        print(url)
+        with urllib.request.urlopen(url) as resp:
+            data = json.load(resp)
+        results.extend(data["results"])
+        offset += limit
+        if offset >= data.get("total_count", 0):
+            break
+
+    for record in results:
+        uai = record.get("uai")
+        if not uai or uai not in schools:
+            continue
+        txr = record.get("taux_reu_total")
+        txm = record.get("taux_men_total")
+        if txr is not None:
+            schools[uai]["txreussite"] = round(float(txr), 1)
+        if txm is not None:
+            schools[uai]["txmention"] = round(float(txm), 1)
+
+    print(f"Merged Bac results for {sum(1 for r in results if r.get('uai') in schools)} lycées")
+    return schools
+
+
 def write_schools_data(schools, path):
     """Écrit le dict des écoles au format JSON.
 
@@ -267,6 +314,7 @@ def generate_geojson_college_sectors(id_projet, schools, path):
 if __name__ == "__main__":
     schools = get_all_paris_schools()
     schools = merge_brevet_results(schools)
+    schools = merge_bac_results(schools)
     write_schools_data(
         schools,
         path=os.path.realpath(

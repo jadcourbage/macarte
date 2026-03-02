@@ -91,8 +91,9 @@ function infoColPath(nom, adresse, codepostal, txreu, txmention, time, distance)
 }
 
 // Generate HTML content for lycée popup
-function infoLyc(nom, adresse, codepostal, type) {
+function infoLyc(nom, adresse, codepostal, type, txreu, txmention) {
     return '<p style="margin:0 0 1px;font-size:13px;font-weight:bold">' + escapeHtml(nom) + '</p>' +
         '<p style="margin:0 0 6px;color:#888;font-size:11px">' + escapeHtml(formatLyceeType(type)) + '</p>' +
-        '<p style="margin:0;color:#555">' + escapeHtml(adresse) + '<br>' + escapeHtml(codepostal) + ' PARIS</p>';
+        '<p style="margin:0;color:#555">' + escapeHtml(adresse) + '<br>' + escapeHtml(codepostal) + ' PARIS</p>' +
+        (txreu != null ? popupRates(txreu, txmention) : '');
 }
