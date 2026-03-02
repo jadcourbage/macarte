@@ -54,12 +54,10 @@ function getAutocompleteConfig() {
                 // Create marker at search location
                 const el = document.createElement('div');
                 el.className = 'location-marker';
-                el.style.width = '24px';
-                el.style.height = '24px';
-                el.style.borderRadius = '50%';
-                el.style.backgroundColor = COLORS.location;
-                el.style.border = '3px solid white';
-                el.style.boxShadow = '0 0 10px rgba(0,0,0,0.3)';
+                el.textContent = '🏠';
+                el.style.fontSize = '24px';
+                el.style.lineHeight = '1';
+                el.style.cursor = 'pointer';
 
                 locationMarker = new maplibregl.Marker(el)
                     .setLngLat([lng, lat])
@@ -120,12 +118,10 @@ function getAutocompleteConfig() {
                                 // Create school marker
                                 const schoolEl = document.createElement('div');
                                 schoolEl.className = 'school-marker';
-                                schoolEl.style.width = '24px';
-                                schoolEl.style.height = '24px';
-                                schoolEl.style.borderRadius = '50%';
-                                schoolEl.style.backgroundColor = COLORS.college;
-                                schoolEl.style.border = '3px solid white';
-                                schoolEl.style.boxShadow = '0 0 10px rgba(0,0,0,0.3)';
+                                schoolEl.textContent = '🏫';
+                                schoolEl.style.fontSize = '24px';
+                                schoolEl.style.lineHeight = '1';
+                                schoolEl.style.cursor = 'pointer';
 
                                 const schoolMarker = new maplibregl.Marker(schoolEl)
                                     .setLngLat([etab.lng, etab.lat])
@@ -164,12 +160,10 @@ function getAutocompleteConfig() {
                 // Point not in any sector - just show marker
                 const el = document.createElement('div');
                 el.className = 'location-marker';
-                el.style.width = '24px';
-                el.style.height = '24px';
-                el.style.borderRadius = '50%';
-                el.style.backgroundColor = COLORS.location;
-                el.style.border = '3px solid white';
-                el.style.boxShadow = '0 0 10px rgba(0,0,0,0.3)';
+                el.textContent = '🏠';
+                el.style.fontSize = '24px';
+                el.style.lineHeight = '1';
+                el.style.cursor = 'pointer';
 
                 locationMarker = new maplibregl.Marker(el)
                     .setLngLat([lng, lat])
