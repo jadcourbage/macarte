@@ -335,7 +335,7 @@ function setupClickHandlers() {
             // Create popup for each school
             const popup = new maplibregl.Popup({ closeOnClick: false })
                 .setLngLat([etab.lng, etab.lat])
-                .setHTML(infoCol(etab.nom, etab.adresse, etab.code_postal, etab.txreussite, etab.txmention))
+                .setHTML(infoCol(etab.nom, etab.adresse, etab.code_postal, etab.nature_uai_libe, etab.txreussite, etab.txmention))
                 .addTo(map);
 
             activePopups.push(popup);
@@ -361,7 +361,7 @@ function setupClickHandlers() {
 
         const popup = new maplibregl.Popup()
             .setLngLat(coords)
-            .setHTML(infoCol(school.nom, school.adresse, school.code_postal, school.txreussite, school.txmention))
+            .setHTML(infoCol(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention))
             .addTo(map);
 
         activePopups.push(popup);

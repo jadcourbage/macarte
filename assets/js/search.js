@@ -136,7 +136,7 @@ function getAutocompleteConfig() {
                                 // Create popup with distance info
                                 const popup = new maplibregl.Popup({ closeOnClick: false })
                                     .setLngLat([etab.lng, etab.lat])
-                                    .setHTML(infoColPath(etab.nom, etab.adresse, etab.code_postal, etab.txreussite, etab.txmention, time, length))
+                                    .setHTML(infoColPath(etab.nom, etab.adresse, etab.code_postal, etab.nature_uai_libe, etab.txreussite, etab.txmention, time, length))
                                     .addTo(map);
 
                                 activePopups.push(popup);
@@ -147,7 +147,7 @@ function getAutocompleteConfig() {
                                 routeBounds.extend([etab.lng, etab.lat]);
                                 const popup = new maplibregl.Popup({ closeOnClick: false })
                                     .setLngLat([etab.lng, etab.lat])
-                                    .setHTML(infoCol(etab.nom, etab.adresse, etab.code_postal, etab.txreussite, etab.txmention))
+                                    .setHTML(infoCol(etab.nom, etab.adresse, etab.code_postal, etab.nature_uai_libe, etab.txreussite, etab.txmention))
                                     .addTo(map);
                                 activePopups.push(popup);
                                 resolve();
