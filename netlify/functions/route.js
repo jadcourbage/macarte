@@ -27,7 +27,7 @@ exports.handler = async (event) => {
   const url = `https://api.openrouteservice.org/v2/directions/foot-walking?api_key=${apiKey}&start=${start}&end=${end}`;
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
     const data = await response.json();
 
     if (!response.ok) {
@@ -46,9 +46,10 @@ exports.handler = async (event) => {
       body: JSON.stringify(data),
     };
   } catch (error) {
+    const isTimeout = error.name === 'TimeoutError' || error.name === 'AbortError';
     return {
-      statusCode: 502,
-      body: JSON.stringify({ error: "Failed to fetch route from upstream" }),
+      statusCode: isTimeout ? 504 : 502,
+      body: JSON.stringify({ error: isTimeout ? "Route service timed out" : "Failed to fetch route from upstream" }),
     };
   }
 };

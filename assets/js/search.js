@@ -5,12 +5,14 @@ let _geocodeTimer = null;
 function getAutocompleteConfig() {
     return {
         source: function(request, response) {
+            const term = request.term.trim();
+            if (term.length < 3) { response([]); return; }
             clearTimeout(_geocodeTimer);
             _geocodeTimer = setTimeout(function() { $.ajax({
                 url: "https://data.geopf.fr/geocodage/search",
                 dataType: "json",
                 data: {
-                    'q': request.term,
+                    'q': term,
                     'index': 'address',
                     'citycode': '75056',
                     'limit': 5
@@ -77,67 +79,81 @@ function getAutocompleteConfig() {
                 const routePromises = etabs.map((etab, index) => {
                     const routeUrl = `/.netlify/functions/route?start=${lng},${lat}&end=${etab.lng},${etab.lat}`;
 
-                    return $.getJSON(routeUrl).then(function(response) {
-                        const routeCoords = response.features[0].geometry.coordinates;
-                        const duration = response.features[0].properties.summary.duration;
-                        const distance = response.features[0].properties.summary.distance;
+                    return new Promise((resolve) => {
+                        $.getJSON(routeUrl)
+                            .done(function(response) {
+                                const routeCoords = response.features[0].geometry.coordinates;
+                                const duration = response.features[0].properties.summary.duration;
+                                const distance = response.features[0].properties.summary.distance;
 
-                        const time = Math.round(duration / 60);
-                        const length = Math.round(distance);
+                                const time = Math.round(duration / 60);
+                                const length = Math.round(distance);
 
-                        // Extend bounds with all route coordinates
-                        routeCoords.forEach(coord => routeBounds.extend(coord));
+                                // Extend bounds with all route coordinates
+                                routeCoords.forEach(coord => routeBounds.extend(coord));
 
-                        // Add route line
-                        const routeId = `route-${index}`;
+                                // Add route line
+                                const routeId = `route-${index}`;
 
-                        map.addSource(routeId, {
-                            type: 'geojson',
-                            data: {
-                                type: 'Feature',
-                                geometry: {
-                                    type: 'LineString',
-                                    coordinates: routeCoords
-                                }
-                            }
-                        });
+                                map.addSource(routeId, {
+                                    type: 'geojson',
+                                    data: {
+                                        type: 'Feature',
+                                        geometry: {
+                                            type: 'LineString',
+                                            coordinates: routeCoords
+                                        }
+                                    }
+                                });
 
-                        map.addLayer({
-                            id: routeId,
-                            type: 'line',
-                            source: routeId,
-                            paint: {
-                                'line-color': '#C23B22',
-                                'line-width': 3,
-                                'line-dasharray': [2, 2]
-                            }
-                        });
+                                map.addLayer({
+                                    id: routeId,
+                                    type: 'line',
+                                    source: routeId,
+                                    paint: {
+                                        'line-color': '#C23B22',
+                                        'line-width': 3,
+                                        'line-dasharray': [2, 2]
+                                    }
+                                });
 
-                        activeRoutes.push(routeId);
+                                activeRoutes.push(routeId);
 
-                        // Create school marker
-                        const schoolEl = document.createElement('div');
-                        schoolEl.className = 'school-marker';
-                        schoolEl.style.width = '24px';
-                        schoolEl.style.height = '24px';
-                        schoolEl.style.borderRadius = '50%';
-                        schoolEl.style.backgroundColor = COLORS.college;
-                        schoolEl.style.border = '3px solid white';
-                        schoolEl.style.boxShadow = '0 0 10px rgba(0,0,0,0.3)';
+                                // Create school marker
+                                const schoolEl = document.createElement('div');
+                                schoolEl.className = 'school-marker';
+                                schoolEl.style.width = '24px';
+                                schoolEl.style.height = '24px';
+                                schoolEl.style.borderRadius = '50%';
+                                schoolEl.style.backgroundColor = COLORS.college;
+                                schoolEl.style.border = '3px solid white';
+                                schoolEl.style.boxShadow = '0 0 10px rgba(0,0,0,0.3)';
 
-                        const schoolMarker = new maplibregl.Marker(schoolEl)
-                            .setLngLat([etab.lng, etab.lat])
-                            .addTo(map);
+                                const schoolMarker = new maplibregl.Marker(schoolEl)
+                                    .setLngLat([etab.lng, etab.lat])
+                                    .addTo(map);
 
-                        activeMarkers.push(schoolMarker);
+                                activeMarkers.push(schoolMarker);
 
-                        // Create popup with distance info
-                        const popup = new maplibregl.Popup({ closeOnClick: false })
-                            .setLngLat([etab.lng, etab.lat])
-                            .setHTML(infoColPath(etab.nom, etab.adresse, etab.code_postal, etab.txreussite, etab.txmention, time, length))
-                            .addTo(map);
+                                // Create popup with distance info
+                                const popup = new maplibregl.Popup({ closeOnClick: false })
+                                    .setLngLat([etab.lng, etab.lat])
+                                    .setHTML(infoColPath(etab.nom, etab.adresse, etab.code_postal, etab.txreussite, etab.txmention, time, length))
+                                    .addTo(map);
 
-                        activePopups.push(popup);
+                                activePopups.push(popup);
+                                resolve();
+                            })
+                            .fail(function() {
+                                // Route unavailable — show school popup without walking info
+                                routeBounds.extend([etab.lng, etab.lat]);
+                                const popup = new maplibregl.Popup({ closeOnClick: false })
+                                    .setLngLat([etab.lng, etab.lat])
+                                    .setHTML(infoCol(etab.nom, etab.adresse, etab.code_postal, etab.txreussite, etab.txmention))
+                                    .addTo(map);
+                                activePopups.push(popup);
+                                resolve();
+                            });
                     });
                 });
 
