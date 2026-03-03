@@ -10,6 +10,9 @@ let activeMarkers = [];
 let lastClickedSectorId = null;
 let locationMarker = null;
 let userLocationMarker = null;
+let lyceeAffectation = null;   // { college_uai: { "1": [...], "2": [...], "3": [...] } }
+let lastSearch = null;          // { lng, lat, label }
+let activeSearchMode = 'colleges'; // 'colleges' | 'both' | 'lycees'
 
 // Paris bounds
 const parisBounds = [[2.27, 48.815], [2.42, 48.905]];
@@ -19,6 +22,14 @@ const parisBoundsMobile = [[2.30, 48.83], [2.39, 48.88]];
 function isMobile() {
     return window.innerWidth < 768;
 }
+
+// Colors for affectation mode markers
+const COLORS_AFFECTATION = {
+    college: '#4A7FB5',
+    lycee1:  '#C23B22',
+    lycee2:  '#4CAF50',
+    lycee3:  '#F5C518'
+};
 
 // Colors for school markers
 const COLORS = {

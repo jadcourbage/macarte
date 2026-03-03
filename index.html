@@ -66,6 +66,12 @@
       <input id="searchbox-mobile" type="text" placeholder="Rechercher une adresse..." class="form-control">
       <button id="clear-mobile" class="search-clear-btn hidden" title="Effacer">×</button>
     </div>
+    <div id="search-filters-mobile" class="search-filters hidden">
+      <span class="filter-label">Afficher :</span>
+      <button class="filter-btn active" data-mode="colleges">Collège</button>
+      <button class="filter-btn" data-mode="both">Collège &amp; lycées</button>
+      <button class="filter-btn" data-mode="lycees">Lycées</button>
+    </div>
   </div>
 
   <!-- Desktop search panel - Google Maps style -->
@@ -76,12 +82,25 @@
         <input id="searchbox-desktop" type="text" placeholder="Rechercher une adresse..." class="search-input">
         <button id="clear-desktop" class="search-clear-btn hidden" title="Effacer">×</button>
       </div>
+      <div id="search-filters" class="search-filters hidden">
+        <span class="filter-label">Afficher :</span>
+        <button class="filter-btn active" data-mode="colleges">Collège</button>
+        <button class="filter-btn" data-mode="both">Collège &amp; lycées</button>
+        <button class="filter-btn" data-mode="lycees">Lycées</button>
+      </div>
     </div>
   </div>
 
   <div id="container">
     <div id="map"></div>
     <div id="results" />
+  </div>
+
+  <div id="affectation-legend" class="hidden">
+    <div class="legend-item" id="legend-college"><span class="legend-dot" style="background:#4A7FB5"></span> Collège</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#C23B22"></span> Lycée secteur 1</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#4CAF50"></span> Lycée secteur 2</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#F5C518"></span> Lycée secteur 3</div>
   </div>
 
   <!--     <div id="loading">

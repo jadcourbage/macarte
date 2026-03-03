@@ -21,20 +21,9 @@ function toggleMenu(item) {
 
 // Initialize menu states
 function initMenuState() {
-    if (!isMobile()) {
-        selectMenu('#colleges-btn');
-    } else {
-        unselectMenu('#colleges-btn');
-    }
-
     selectMenu('#colleges-secto-btn');
     unselectMenu('#colleges-txreu-btn');
     unselectMenu('#colleges-txmention-btn');
-    unselectMenu('#lycees-eg-btn');
-    unselectMenu('#lycees-tech-btn');
-    unselectMenu('#lycees-eg-tech-btn');
-    unselectMenu('#lycees-poly-btn');
-    unselectMenu('#lycees-pro-btn');
 }
 
 function escapeHtml(str) {
@@ -64,13 +53,13 @@ function formatSchoolType(type) {
     return SCHOOL_TYPE_LABELS[type] || type;
 }
 
-function popupRates(txreu, txmention) {
+function popupRates(txreu, txmention, examLabel) {
     return '<hr style="margin:6px 0">' +
         '<div style="display:flex;gap:12px">' +
         '<span>R\u00e9ussite\u00a0<b>' + formatRate(txreu) + '</b></span>' +
         '<span>Mentions\u00a0<b>' + formatRate(txmention) + '</b></span>' +
         '</div>' +
-        '<p style="margin:4px 0 0;color:#999;font-size:11px">R\u00e9sultats session 2024</p>';
+        '<p style="margin:4px 0 0;color:#999;font-size:11px">R\u00e9sultats ' + examLabel + ' 2024</p>';
 }
 
 function popupSchoolHeader(nom, type) {
@@ -82,7 +71,7 @@ function popupSchoolHeader(nom, type) {
 function infoCol(nom, adresse, codepostal, type, txreu, txmention) {
     return popupSchoolHeader(nom, type) +
         '<p style="margin:0 0 4px;color:#555">' + escapeHtml(adresse) + '<br>' + escapeHtml(codepostal) + ' PARIS</p>' +
-        popupRates(txreu, txmention);
+        popupRates(txreu, txmention, 'brevet');
 }
 
 // Generate HTML content for college popup with walking distance
@@ -93,12 +82,12 @@ function infoColPath(nom, adresse, codepostal, type, txreu, txmention, time, dis
         '</div>' +
         popupSchoolHeader(nom, type) +
         '<p style="margin:0 0 4px;color:#555">' + escapeHtml(adresse) + '<br>' + escapeHtml(codepostal) + ' PARIS</p>' +
-        popupRates(txreu, txmention);
+        popupRates(txreu, txmention, 'brevet');
 }
 
 // Generate HTML content for lycée popup
 function infoLyc(nom, adresse, codepostal, type, txreu, txmention) {
     return popupSchoolHeader(nom, type) +
         '<p style="margin:0;color:#555">' + escapeHtml(adresse) + '<br>' + escapeHtml(codepostal) + ' PARIS</p>' +
-        (txreu != null ? popupRates(txreu, txmention) : '');
+        (txreu != null ? popupRates(txreu, txmention, 'bac') : '');
 }

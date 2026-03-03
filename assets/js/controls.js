@@ -114,17 +114,9 @@ class LayerControl {
             <div class="layer-sheet-handle"></div>
             <button class="layer-sheet-close" aria-label="Fermer">&times;</button>
             <div class="layer-section-title">Collèges</div>
-            <a href="#" id="colleges-btn" class="layer-item"><i class="fa fa-circle blue"></i>&nbsp; Collèges (marqueurs)</a>
             <a href="#" id="colleges-secto-btn" class="layer-item"><i class="fa fa-map-o"></i>&nbsp; Carte scolaire</a>
             <a href="#" id="colleges-txreu-btn" class="layer-item"><i class="fa fa-percent"></i>&nbsp; Taux de réussite au Brevet</a>
             <a href="#" id="colleges-txmention-btn" class="layer-item"><i class="fa fa-percent"></i>&nbsp; Taux de mention au Brevet</a>
-            <div class="layer-divider"></div>
-            <div class="layer-section-title">Lycées</div>
-            <a href="#" id="lycees-eg-btn" class="layer-item"><i class="fa fa-circle red"></i>&nbsp; Enseignement général</a>
-            <a href="#" id="lycees-tech-btn" class="layer-item"><i class="fa fa-circle green"></i>&nbsp; Enseignement technologique</a>
-            <a href="#" id="lycees-eg-tech-btn" class="layer-item"><i class="fa fa-circle orange"></i>&nbsp; Gén. &amp; Technologique</a>
-            <a href="#" id="lycees-poly-btn" class="layer-item"><i class="fa fa-circle violet"></i>&nbsp; Polyvalents</a>
-            <a href="#" id="lycees-pro-btn" class="layer-item"><i class="fa fa-circle yellow"></i>&nbsp; Professionnels</a>
         `;
 
         const backdrop = document.createElement('div');

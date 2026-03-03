@@ -104,16 +104,21 @@ function initMap() {
 // Load GeoJSON data and add layers
 async function loadDataAndAddLayers() {
     try {
-        const [sectorsRes, schoolsRes] = await Promise.all([
+        const [sectorsRes, schoolsRes, lyceeAffectRes] = await Promise.all([
             fetch('data/colleges_sectors.geojson'),
-            fetch('data/schools_data.json')
+            fetch('data/schools_data.json'),
+            fetch('data/lycee_affectation.json')
         ]);
 
         sectorsData = await sectorsRes.json();
         schoolsData = await schoolsRes.json();
+        lyceeAffectation = await lyceeAffectRes.json();
 
         // Compute and inject sector colors at runtime
         computeSectorColors(sectorsData, schoolsData);
+
+        // Assign numeric IDs required for setFeatureState (not present in generated GeoJSON)
+        sectorsData.features.forEach((f, i) => { f.id = i; });
 
         // Add sources
         map.addSource('colleges', {
@@ -175,7 +180,7 @@ async function loadDataAndAddLayers() {
                 'circle-stroke-width': 1
             },
             layout: {
-                visibility: isMobile() ? 'none' : 'visible'
+                visibility: 'none'
             }
         });
 
@@ -311,9 +316,8 @@ function setupClickHandlers() {
                     return bounds.extend(coord);
                 }, new maplibregl.LngLatBounds(coordinates[0], coordinates[0]));
 
-        // Clear previous popups
+        // Clear previous popups and routes (keep affectation markers)
         clearPopups();
-        clearMarkers();
         clearRoutes();
 
         // Reset previous sector highlight

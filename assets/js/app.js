@@ -2,35 +2,9 @@
 
 // Event handlers setup
 function setupEventHandlers() {
-    // College layers
-    $('#colleges-btn').click(function() {
-        toggleColleges();
-    });
-
     // College sectors
     $('#colleges-txmention-btn, #colleges-secto-btn, #colleges-txreu-btn').click(function() {
         toggleSecteurs(this);
-    });
-
-    // Lycée layers
-    $('#lycees-eg-btn').click(function() {
-        toggleLyceesEG();
-    });
-
-    $('#lycees-tech-btn').click(function() {
-        toggleLyceesTech();
-    });
-
-    $('#lycees-eg-tech-btn').click(function() {
-        toggleLyceesEGTech();
-    });
-
-    $('#lycees-poly-btn').click(function() {
-        toggleLyceesPoly();
-    });
-
-    $('#lycees-pro-btn').click(function() {
-        toggleLyceesPro();
     });
 
     // Search box handlers (desktop and mobile)
