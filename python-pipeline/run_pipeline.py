@@ -223,6 +223,66 @@ def merge_bac_results(schools):
     return schools
 
 
+ELITE_LYCEE_UAIS = ['0750654D', '0750655E', '0750685M']
+
+
+def get_lycee_affectation():
+    """Fetch lycée affectation data from ArcGIS FeatureServer (paginated).
+
+    Returns:
+        dict: { college_uai: { "1": [...], "2": [...], "3": [...] } }
+    """
+    base = (
+        "https://services9.arcgis.com/ekT8MJFiVh8nvlV5/arcgis/rest/services/"
+        "Affectation_Lyc%C3%A9es/FeatureServer/0/query"
+        "?f=json&where=(Nom_tete+like+'%25')&outFields=*&returnGeometry=false&resultRecordCount=1000"
+    )
+
+    all_features = []
+    offset = 0
+    while True:
+        url = f"{base}&resultOffset={offset}"
+        print(f"Fetching lycée affectation: offset={offset}")
+        with urllib.request.urlopen(url) as resp:
+            data = json.load(resp)
+        batch = data.get("features", [])
+        all_features.extend(batch)
+        if not data.get("exceededTransferLimit"):
+            break
+        offset += len(batch)
+
+    print(f"Total ArcGIS features fetched: {len(all_features)}")
+
+    affectation = {}
+    for feature in all_features:
+        attrs = feature.get("attributes", {})
+        if attrs.get("type") != "LYC":
+            continue
+        college_uai = attrs.get("Réseau")
+        lycee_uai = attrs.get("UAI")
+        secteur = str(attrs.get("secteur", ""))
+        if not college_uai or not lycee_uai or secteur not in ("1", "2", "3"):
+            continue
+        if college_uai not in affectation:
+            affectation[college_uai] = {"1": [], "2": [], "3": []}
+        if lycee_uai not in affectation[college_uai][secteur]:
+            affectation[college_uai][secteur].append(lycee_uai)
+
+    # Prepend elite UAIs to every college's secteur 1 list (deduped)
+    for sectors in affectation.values():
+        sectors["1"] = list(dict.fromkeys(ELITE_LYCEE_UAIS + sectors["1"]))
+
+    print(f"Fetched affectation for {len(affectation)} colleges")
+    return affectation
+
+
+def write_lycee_affectation(affectation, path):
+    """Écrit le dict d'affectation lycée au format JSON."""
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(affectation, f, ensure_ascii=False)
+    print(f"Written lycee affectation for {len(affectation)} colleges to {path}")
+
+
 def write_schools_data(schools, path):
     """Écrit le dict des écoles au format JSON.
 
@@ -326,5 +386,12 @@ if __name__ == "__main__":
         schools=schools,
         path=os.path.realpath(
             os.path.join(__file__, "..", "..", "data", "colleges_sectors.geojson")
+        ),
+    )
+    lycee_affectation = get_lycee_affectation()
+    write_lycee_affectation(
+        lycee_affectation,
+        path=os.path.realpath(
+            os.path.join(__file__, "..", "..", "data", "lycee_affectation.json")
         ),
     )
