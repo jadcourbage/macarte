@@ -143,7 +143,14 @@ function toggleSecteurs(item) {
     }
 }
 
-// Find college sector containing a point using Turf.js
+// Clear affectation legend
+function clearLegend() {
+    document.getElementById('affectation-legend').classList.add('hidden');
+}
+
+// Find college sector containing a point using Turf.js.
+// Falls back to nearest sector within 100m to handle geocoded points
+// that land just outside a polygon boundary (~10-15m is common).
 function findSectorForPoint(lng, lat) {
     const point = turf.point([lng, lat]);
 
@@ -152,5 +159,23 @@ function findSectorForPoint(lng, lat) {
             return feature;
         }
     }
-    return null;
+
+    // Fallback: nearest sector within 100m
+    let nearest = null;
+    let nearestDist = Infinity;
+    for (const feature of sectorsData.features) {
+        const rings = feature.geometry.type === 'MultiPolygon'
+            ? feature.geometry.coordinates.flat(1)
+            : feature.geometry.coordinates;
+        for (const ring of rings) {
+            const line = turf.lineString(ring);
+            const nearestPt = turf.nearestPointOnLine(line, point);
+            const dist = turf.distance(point, nearestPt, { units: 'meters' });
+            if (dist < nearestDist) {
+                nearestDist = dist;
+                nearest = feature;
+            }
+        }
+    }
+    return nearestDist <= 100 ? nearest : null;
 }
