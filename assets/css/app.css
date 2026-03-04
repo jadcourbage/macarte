@@ -777,6 +777,36 @@ input[type="radio"], input[type="checkbox"] {
   border-bottom: 1px solid #f1f3f4;
 }
 
+.list-card[data-lng] {
+  cursor: pointer;
+}
+
+.list-card[data-lng]:hover {
+  background-color: #f1f3f4;
+}
+
+/* Marker highlight: pulsing ring using box-shadow only.
+   transform: scale is intentionally avoided — MapLibre positions markers
+   with its own transform on the parent wrapper, and stacking a scale()
+   on the child causes the element to be clipped by the canvas container.
+   box-shadow paints outside the border-box without affecting layout or
+   triggering that clipping, and works for all marker color variants. */
+@keyframes marker-pulse {
+  0%   { box-shadow: 0 0 0 2px rgba(255,255,255,0.95), 0 0 0 4px rgba(30,80,160,0.75); }
+  60%  { box-shadow: 0 0 0 2px rgba(255,255,255,0.95), 0 0 0 10px rgba(30,80,160,0.0); }
+  100% { box-shadow: 0 0 0 2px rgba(255,255,255,0.95), 0 0 0 10px rgba(30,80,160,0.0); }
+}
+
+.marker-highlight {
+  /* Immediately visible tight white ring + dark halo; no transform. */
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.95), 0 0 0 4px rgba(30,80,160,0.75) !important;
+  animation: marker-pulse 1.2s ease-out infinite !important;
+  /* Ensure the shadow ring is not clipped by any overflow:hidden ancestor.
+     z-index elevation keeps the highlighted marker visually on top. */
+  position: relative !important;
+  z-index: 10 !important;
+}
+
 .list-card-name {
   margin: 0 0 2px;
   font-size: 13px;

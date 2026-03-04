@@ -296,6 +296,8 @@ function renderSearchResult() {
 
 function listCardHtml(school, borderColor, examLabel) {
     const borderStyle = borderColor ? `border-left: 4px solid ${borderColor};` : '';
+    const coordAttrs = (school.lng != null && school.lat != null)
+        ? ` data-lng="${school.lng}" data-lat="${school.lat}"` : '';
     const hasResults = school.txreussite != null;
     const resultsHtml = hasResults
         ? `<div class="list-card-rates">
@@ -303,7 +305,7 @@ function listCardHtml(school, borderColor, examLabel) {
              <span>Mentions&#160;<b>${formatRate(school.txmention)}</b></span>
            </div>
            <p class="list-card-exam-label">R\u00e9sultats ${escapeHtml(examLabel)} 2024</p>` : '';
-    return `<div class="list-card" style="${borderStyle}">
+    return `<div class="list-card" style="${borderStyle}"${coordAttrs}>
       <p class="list-card-name">${escapeHtml(school.nom)}</p>
       <p class="list-card-type">${escapeHtml(formatSchoolType(school.nature_uai_libe))}</p>
       <p class="list-card-address">${escapeHtml(school.adresse)}, ${escapeHtml(school.code_postal)} Paris</p>
@@ -353,6 +355,39 @@ function buildListHtml(data, mode) {
     return html || `<div class="list-card"><p class="list-card-name" style="color:#999">Aucune donn\u00e9e disponible</p></div>`;
 }
 
+function attachListHoverHandlers() {
+    let lastHighlightedEl = null;
+
+    function clearHighlight() {
+        if (lastHighlightedEl) {
+            lastHighlightedEl.classList.remove('marker-highlight');
+            lastHighlightedEl = null;
+        }
+    }
+
+    function highlightAtCoords(lng, lat) {
+        clearHighlight();
+        const marker = activeMarkers.find(m => {
+            const pos = m.getLngLat();
+            return Math.abs(pos.lng - lng) < 0.00005 && Math.abs(pos.lat - lat) < 0.00005;
+        });
+        if (!marker) return;
+        lastHighlightedEl = marker.getElement();
+        lastHighlightedEl.classList.add('marker-highlight');
+    }
+
+    document.querySelectorAll('#list-panel-desktop-content .list-card[data-lng]').forEach(card => {
+        const lng = parseFloat(card.dataset.lng);
+        const lat = parseFloat(card.dataset.lat);
+        card.addEventListener('mouseenter', () => highlightAtCoords(lng, lat));
+        card.addEventListener('mouseleave', clearHighlight);
+        card.addEventListener('click', () => {
+            highlightAtCoords(lng, lat);
+            map.flyTo({ center: [lng, lat], zoom: 16, speed: 1.5 });
+        });
+    });
+}
+
 function showListPanel(html) {
     if (isMobile()) {
         document.getElementById('list-panel-mobile-content').innerHTML = html;
@@ -361,6 +396,7 @@ function showListPanel(html) {
     } else {
         document.getElementById('list-panel-desktop-content').innerHTML = html;
         document.getElementById('list-panel-desktop').classList.remove('hidden');
+        attachListHoverHandlers();
     }
 }
 
