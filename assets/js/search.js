@@ -549,13 +549,20 @@ function setupAddressSearch() {
     });
     $("#searchbox-desktop").autocomplete(desktopConfig);
 
-    // Wire filter buttons (both desktop and mobile)
+    // Wire filter buttons (both desktop and mobile) — independent toggles
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            activeSearchMode = btn.dataset.mode;
-            // Sync all filter buttons to same active state
-            document.querySelectorAll('.filter-btn').forEach(b =>
-                b.classList.toggle('active', b.dataset.mode === activeSearchMode));
+            const nowActive = !btn.classList.contains('active');
+            // Sync desktop + mobile buttons for this mode
+            document.querySelectorAll(`.filter-btn[data-mode="${btn.dataset.mode}"]`).forEach(b =>
+                b.classList.toggle('active', nowActive));
+            // Derive combined mode from current active state
+            const colActive = !!document.querySelector('.filter-btn[data-mode="colleges"].active');
+            const lycActive = !!document.querySelector('.filter-btn[data-mode="lycees"].active');
+            if (colActive && lycActive) activeSearchMode = 'both';
+            else if (colActive) activeSearchMode = 'colleges';
+            else if (lycActive) activeSearchMode = 'lycees';
+            else activeSearchMode = null;
             renderSearchResult();
         });
     });
