@@ -106,6 +106,8 @@ function renderCollegesMode(sector, lng, lat) {
     const routeBounds = new maplibregl.LngLatBounds();
     routeBounds.extend([lng, lat]);
 
+    document.getElementById('route-loader').classList.remove('hidden');
+
     const routePromises = etabs.map((etab, index) => {
         const routeUrl = `/.netlify/functions/route?start=${lng},${lat}&end=${etab.lng},${etab.lat}`;
 
@@ -170,6 +172,7 @@ function renderCollegesMode(sector, lng, lat) {
     });
 
     Promise.all(routePromises).then(() => {
+        document.getElementById('route-loader').classList.add('hidden');
         map.fitBounds(routeBounds, { padding: 80 });
     });
 }
