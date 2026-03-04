@@ -142,12 +142,17 @@ def get_all_paris_schools():
                 "lng": round(float(lng), 5) if lng is not None else None,
             }
 
-        total = data.get("total_count", 0)
+        batch = data["results"]
         offset += limit
-        if offset >= total:
+        if len(batch) < limit:
             break
 
     print(f"Fetched {len(schools)} schools total")
+    if len(schools) < 1200:
+        raise RuntimeError(
+            f"Only {len(schools)} schools fetched — API returned incomplete data. "
+            "Re-run the pipeline."
+        )
     return schools
 
 
@@ -194,7 +199,7 @@ def merge_ips_colleges(schools):
     while True:
         payload = [
             ("refine", 'rentree_scolaire:"2024-2025"'),
-            ("refine", 'code_du_departement:"075"'),
+            ("refine", 'code_du_departement:"75"'),
             ("select", "uai,ips,ips_national,ips_academique"),
             ("limit", limit),
             ("offset", offset),
@@ -203,9 +208,10 @@ def merge_ips_colleges(schools):
         print(url)
         with urllib.request.urlopen(url) as resp:
             data = json.load(resp)
-        results.extend(data["results"])
+        batch = data["results"]
+        results.extend(batch)
         offset += limit
-        if offset >= data.get("total_count", 0):
+        if len(batch) < limit:
             break
 
     matched = 0
@@ -222,6 +228,15 @@ def merge_ips_colleges(schools):
             schools[uai]["ips_national"] = round(float(ips_nat), 1)
         if ips_acad is not None:
             schools[uai]["ips_academique"] = round(float(ips_acad), 1)
+        if (ips is not None and ips_nat is not None and ips_acad is not None
+                and schools[uai].get("secteur_public_prive_libe") == "Public"):
+            ips_val = float(ips)
+            if ips_val < float(ips_nat):
+                schools[uai]["bonus_ips"] = 1200
+            elif ips_val < float(ips_acad):
+                schools[uai]["bonus_ips"] = 600
+            else:
+                schools[uai]["bonus_ips"] = 0
         matched += 1
 
     print(f"Merged IPS for {matched} colleges")
@@ -255,9 +270,10 @@ def merge_bac_results(schools):
         print(url)
         with urllib.request.urlopen(url) as resp:
             data = json.load(resp)
-        results.extend(data["results"])
+        batch = data["results"]
+        results.extend(batch)
         offset += limit
-        if offset >= data.get("total_count", 0):
+        if len(batch) < limit:
             break
 
     for record in results:

@@ -38,6 +38,9 @@ function setColSecteurStyle(mode) {
         case 'mention':
             colorProp = ['get', 'colmention'];
             break;
+        case 'ips':
+            colorProp = ['get', 'colips'];
+            break;
         default:
             colorProp = ['get', 'colzone'];
     }
@@ -118,6 +121,7 @@ function toggleSecteurs(item) {
             toggleMenu(item);
             unselectMenu(document.getElementById('colleges-txreu-btn'));
             unselectMenu(document.getElementById('colleges-txmention-btn'));
+            unselectMenu(document.getElementById('colleges-ips-btn'));
             showLayer('colSecteurs-fill');
             showLayer('colSecteurs-outline');
             setColSecteurStyle('zone');
@@ -127,6 +131,7 @@ function toggleSecteurs(item) {
             toggleMenu(item);
             unselectMenu(document.getElementById('colleges-secto-btn'));
             unselectMenu(document.getElementById('colleges-txmention-btn'));
+            unselectMenu(document.getElementById('colleges-ips-btn'));
             showLayer('colSecteurs-fill');
             showLayer('colSecteurs-outline');
             setColSecteurStyle('reussite');
@@ -136,9 +141,20 @@ function toggleSecteurs(item) {
             toggleMenu(item);
             unselectMenu(document.getElementById('colleges-secto-btn'));
             unselectMenu(document.getElementById('colleges-txreu-btn'));
+            unselectMenu(document.getElementById('colleges-ips-btn'));
             showLayer('colSecteurs-fill');
             showLayer('colSecteurs-outline');
             setColSecteurStyle('mention');
+        }
+
+        if (item.id === 'colleges-ips-btn') {
+            toggleMenu(item);
+            unselectMenu(document.getElementById('colleges-secto-btn'));
+            unselectMenu(document.getElementById('colleges-txreu-btn'));
+            unselectMenu(document.getElementById('colleges-txmention-btn'));
+            showLayer('colSecteurs-fill');
+            showLayer('colSecteurs-outline');
+            setColSecteurStyle('ips');
         }
     }
 }

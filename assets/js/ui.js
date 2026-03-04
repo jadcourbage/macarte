@@ -24,6 +24,7 @@ function initMenuState() {
     selectMenu('#colleges-secto-btn');
     unselectMenu('#colleges-txreu-btn');
     unselectMenu('#colleges-txmention-btn');
+    unselectMenu('#colleges-ips-btn');
 }
 
 function escapeHtml(str) {

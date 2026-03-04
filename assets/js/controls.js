@@ -117,6 +117,7 @@ class LayerControl {
             <a href="#" id="colleges-secto-btn" class="layer-item"><i class="fa fa-map-o"></i>&nbsp; Carte scolaire</a>
             <a href="#" id="colleges-txreu-btn" class="layer-item"><i class="fa fa-percent"></i>&nbsp; Taux de réussite au Brevet</a>
             <a href="#" id="colleges-txmention-btn" class="layer-item"><i class="fa fa-percent"></i>&nbsp; Taux de mention au Brevet</a>
+            <a href="#" id="colleges-ips-btn" class="layer-item"><i class="fa fa-users"></i>&nbsp; Indice de positionnement social</a>
         `;
 
         const backdrop = document.createElement('div');

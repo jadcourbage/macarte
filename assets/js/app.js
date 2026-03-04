@@ -3,7 +3,7 @@
 // Event handlers setup
 function setupEventHandlers() {
     // College sectors
-    $('#colleges-txmention-btn, #colleges-secto-btn, #colleges-txreu-btn').click(function() {
+    $('#colleges-txmention-btn, #colleges-secto-btn, #colleges-txreu-btn, #colleges-ips-btn').click(function() {
         toggleSecteurs(this);
     });
 

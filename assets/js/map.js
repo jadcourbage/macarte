@@ -40,6 +40,7 @@ function computeSectorColors(sectorsGeoJSON, schools) {
     const colleges = Object.values(schools).filter(s => s.nature_uai === 340 && s.txreussite != null);
     const allReussite = colleges.map(s => s.txreussite);
     const allMention  = colleges.map(s => s.txmention);
+    const allIps      = Object.values(schools).filter(s => s.nature_uai === 340 && s.ips != null).map(s => s.ips);
     const rng = seededRandom(1234);
 
     sectorsGeoJSON.features.forEach(f => {
@@ -54,9 +55,15 @@ function computeSectorColors(sectorsGeoJSON, schools) {
             ? etabs.filter(e => e.txmention  != null).reduce((s, e) => s + e.txmention,  0) / count
             : 0;
 
+        const ipsEtabs = etabs.filter(e => e.ips != null);
+        const avgIps = ipsEtabs.length > 0
+            ? ipsEtabs.reduce((s, e) => s + e.ips, 0) / ipsEtabs.length
+            : null;
+
         f.properties.colzone     = ZONE_COLORS[Math.floor(rng() * ZONE_COLORS.length)];
-        f.properties.colreussite = allReussite.length > 0 ? rateToColor(txr, allReussite, REUSSITE_GRADIENT) : '#cccccc';
-        f.properties.colmention  = allMention.length  > 0 ? rateToColor(txm, allMention,  REUSSITE_GRADIENT) : '#cccccc';
+        f.properties.colreussite = (count > 0 && allReussite.length > 0) ? rateToColor(txr, allReussite, REUSSITE_GRADIENT) : '#cccccc';
+        f.properties.colmention  = (count > 0 && allMention.length  > 0) ? rateToColor(txm, allMention,  REUSSITE_GRADIENT) : '#cccccc';
+        f.properties.colips      = avgIps != null && allIps.length > 0 ? rateToColor(avgIps, allIps, REUSSITE_GRADIENT) : '#cccccc';
     });
 }
 
