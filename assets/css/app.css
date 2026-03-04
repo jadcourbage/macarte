@@ -814,6 +814,12 @@ input[type="radio"], input[type="checkbox"] {
   color: #202124;
 }
 
+.list-card-dist {
+  font-weight: normal;
+  font-size: 11px;
+  color: #9aa0a6;
+}
+
 .list-card-type {
   margin: 0 0 2px;
   font-size: 11px;

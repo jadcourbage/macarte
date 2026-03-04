@@ -294,10 +294,17 @@ function renderSearchResult() {
 // List View
 // ====================================
 
-function listCardHtml(school, borderColor, examLabel) {
+function formatDist(km) {
+    if (km < 1) return Math.round(km * 1000) + '\u00a0m';
+    return km.toFixed(1).replace('.', ',') + '\u00a0km';
+}
+
+function listCardHtml(school, borderColor, examLabel, distance) {
     const borderStyle = borderColor ? `border-left: 4px solid ${borderColor};` : '';
     const coordAttrs = (school.lng != null && school.lat != null)
         ? ` data-lng="${school.lng}" data-lat="${school.lat}"` : '';
+    const distHtml = distance != null
+        ? ` <span class="list-card-dist">(${formatDist(distance)})</span>` : '';
     const hasResults = school.txreussite != null;
     const resultsHtml = hasResults
         ? `<div class="list-card-rates">
@@ -306,7 +313,7 @@ function listCardHtml(school, borderColor, examLabel) {
            </div>
            <p class="list-card-exam-label">R\u00e9sultats ${escapeHtml(examLabel)} 2024</p>` : '';
     return `<div class="list-card" style="${borderStyle}"${coordAttrs}>
-      <p class="list-card-name">${escapeHtml(school.nom)}</p>
+      <p class="list-card-name">${escapeHtml(school.nom)}${distHtml}</p>
       <p class="list-card-type">${escapeHtml(formatSchoolType(school.nature_uai_libe))}</p>
       <p class="list-card-address">${escapeHtml(school.adresse)}, ${escapeHtml(school.code_postal)} Paris</p>
       ${resultsHtml}
@@ -328,14 +335,20 @@ function buildListHtml(data, mode) {
         '3': 'Lyc\u00e9es \u2014 secteur 3'
     };
 
+    function distFrom(school) {
+        if (!school || school.lng == null || school.lat == null || !lastSearch) return Infinity;
+        return turf.distance([lastSearch.lng, lastSearch.lat], [school.lng, school.lat], { units: 'kilometers' });
+    }
+
     if (mode === 'colleges' || mode === 'both') {
         const borderColor = mode === 'both' ? COLORS_AFFECTATION.college : null;
         html += `<div class="list-section-header" style="border-left: 4px solid ${COLORS_AFFECTATION.college};">Coll\u00e8ge</div>`;
         if (data.colleges.length === 0) {
             html += `<div class="list-card"><p class="list-card-name" style="color:#999">Aucun coll\u00e8ge trouv\u00e9</p></div>`;
         } else {
-            data.colleges.forEach(school => {
-                html += listCardHtml(school, borderColor, 'brevet');
+            [...data.colleges].sort((a, b) => distFrom(a) - distFrom(b)).forEach(school => {
+                const d = distFrom(school);
+                html += listCardHtml(school, borderColor, 'brevet', isFinite(d) ? d : null);
             });
         }
     }
@@ -344,11 +357,14 @@ function buildListHtml(data, mode) {
         ['1', '2', '3'].forEach(s => {
             if (data.lyceesBySecteur[s].length === 0) return;
             html += `<div class="list-section-header" style="border-left: 4px solid ${secteurColors[s]};">${secteurLabels[s]}</div>`;
-            data.lyceesBySecteur[s].forEach(uai => {
-                const school = schoolsData[uai];
-                if (!school) return;
-                html += listCardHtml(school, secteurColors[s], 'bac');
-            });
+            [...data.lyceesBySecteur[s]]
+                .sort((a, b) => distFrom(schoolsData[a]) - distFrom(schoolsData[b]))
+                .forEach(uai => {
+                    const school = schoolsData[uai];
+                    if (!school) return;
+                    const d = distFrom(school);
+                    html += listCardHtml(school, secteurColors[s], 'bac', isFinite(d) ? d : null);
+                });
         });
     }
 
@@ -388,6 +404,18 @@ function attachListHoverHandlers() {
     });
 }
 
+function refitBoundsForListPanel() {
+    const schoolMarkers = activeMarkers.filter(m => m !== locationMarker);
+    if (schoolMarkers.length === 0) return;
+    const bounds = new maplibregl.LngLatBounds();
+    activeMarkers.forEach(m => bounds.extend(m.getLngLat()));
+    const panelWidth = document.getElementById('list-panel-desktop')?.offsetWidth || 400;
+    map.fitBounds(bounds, {
+        padding: { left: panelWidth + 32, top: 80, right: 80, bottom: 80 },
+        maxZoom: 14
+    });
+}
+
 function showListPanel(html) {
     if (isMobile()) {
         document.getElementById('list-panel-mobile-content').innerHTML = html;
@@ -397,6 +425,7 @@ function showListPanel(html) {
         document.getElementById('list-panel-desktop-content').innerHTML = html;
         document.getElementById('list-panel-desktop').classList.remove('hidden');
         attachListHoverHandlers();
+        refitBoundsForListPanel();
     }
 }
 
