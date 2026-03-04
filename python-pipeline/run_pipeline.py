@@ -176,6 +176,58 @@ def merge_brevet_results(schools):
     return schools
 
 
+def merge_ips_colleges(schools):
+    """Ajoute l'indice de positionnement social (IPS) pour les collèges parisiens.
+
+    Args:
+        schools (dict): keyed by UAI, modified in place.
+
+    Returns:
+        dict: same dict with ips/ips_national/ips_academique added to college entries.
+    """
+    base = ("https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets"
+            "/fr-en-ips-colleges-ap2023/records")
+
+    results = []
+    offset = 0
+    limit = 100
+    while True:
+        payload = [
+            ("refine", 'rentree_scolaire:"2024-2025"'),
+            ("refine", 'code_du_departement:"075"'),
+            ("select", "uai,ips,ips_national,ips_academique"),
+            ("limit", limit),
+            ("offset", offset),
+        ]
+        url = f"{base}?{urlencode(payload)}"
+        print(url)
+        with urllib.request.urlopen(url) as resp:
+            data = json.load(resp)
+        results.extend(data["results"])
+        offset += limit
+        if offset >= data.get("total_count", 0):
+            break
+
+    matched = 0
+    for record in results:
+        uai = record.get("uai")
+        if not uai or uai not in schools:
+            continue
+        ips = record.get("ips")
+        ips_nat = record.get("ips_national")
+        ips_acad = record.get("ips_academique")
+        if ips is not None:
+            schools[uai]["ips"] = round(float(ips), 1)
+        if ips_nat is not None:
+            schools[uai]["ips_national"] = round(float(ips_nat), 1)
+        if ips_acad is not None:
+            schools[uai]["ips_academique"] = round(float(ips_acad), 1)
+        matched += 1
+
+    print(f"Merged IPS for {matched} colleges")
+    return schools
+
+
 def merge_bac_results(schools):
     """Ajoute les taux de réussite et de mention au Bac pour les lycées.
 
@@ -375,6 +427,7 @@ if __name__ == "__main__":
     schools = get_all_paris_schools()
     schools = merge_brevet_results(schools)
     schools = merge_bac_results(schools)
+    schools = merge_ips_colleges(schools)
     write_schools_data(
         schools,
         path=os.path.realpath(
