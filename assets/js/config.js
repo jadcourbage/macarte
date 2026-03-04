@@ -13,6 +13,7 @@ let userLocationMarker = null;
 let lyceeAffectation = null;   // { college_uai: { "1": [...], "2": [...], "3": [...] } }
 let lastSearch = null;          // { lng, lat, label }
 let activeSearchMode = null; // null | 'colleges' | 'both' | 'lycees'
+let listViewActive = false;
 
 // Paris bounds
 const parisBounds = [[2.27, 48.815], [2.42, 48.905]];

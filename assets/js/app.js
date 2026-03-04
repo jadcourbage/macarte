@@ -32,12 +32,15 @@ function setupEventHandlers() {
             clearPopups();
             clearMarkers();
             clearRoutes();
+            clearLegend();
+            hideListToggle();
             if (locationMarker) { locationMarker.remove(); locationMarker = null; }
             input.focus();
         });
     }
     setupClearBtn('searchbox-desktop', 'clear-desktop');
     setupClearBtn('searchbox-mobile', 'clear-mobile');
+    setupListView();
 }
 
 // Initialize everything when DOM is ready

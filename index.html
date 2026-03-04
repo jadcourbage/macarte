@@ -71,6 +71,9 @@
       <button class="filter-btn" data-mode="colleges">Collège</button>
       <button class="filter-btn" data-mode="both">Collège &amp; lycées</button>
       <button class="filter-btn" data-mode="lycees">Lycées</button>
+      <button id="list-toggle-mobile" class="list-toggle-btn hidden" title="Voir la liste">
+        <i class="fa fa-list"></i>
+      </button>
     </div>
   </div>
 
@@ -87,7 +90,13 @@
         <button class="filter-btn" data-mode="colleges">Collège</button>
         <button class="filter-btn" data-mode="both">Collège &amp; lycées</button>
         <button class="filter-btn" data-mode="lycees">Lycées</button>
+        <button id="list-toggle-desktop" class="list-toggle-btn hidden" title="Voir la liste">
+          <i class="fa fa-list"></i>
+        </button>
       </div>
+    </div>
+    <div id="list-panel-desktop" class="list-panel hidden">
+      <div id="list-panel-desktop-content"></div>
     </div>
   </div>
 
@@ -227,8 +236,12 @@
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
 
-
-
+  <div id="list-panel-mobile" class="list-sheet">
+    <div class="list-sheet-handle"></div>
+    <button class="list-sheet-close" id="list-sheet-close-btn" aria-label="Fermer">&times;</button>
+    <div id="list-panel-mobile-content" class="list-sheet-content"></div>
+  </div>
+  <div id="list-panel-backdrop" class="list-panel-backdrop-el"></div>
 
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>

@@ -177,15 +177,31 @@ function renderCollegesMode(sector, lng, lat) {
     });
 }
 
+function getAffectationData(sector) {
+    if (!sector) return { colleges: [], lyceesBySecteur: { '1': [], '2': [], '3': [] } };
+    const uais = typeof sector.properties.uais === 'string'
+        ? JSON.parse(sector.properties.uais) : sector.properties.uais;
+    const colleges = uais.map(uai => schoolsData[uai]).filter(Boolean);
+    const lyceesBySecteur = { '1': [], '2': [], '3': [] };
+    uais.forEach(collegeUai => {
+        const aff = lyceeAffectation[collegeUai];
+        if (!aff) return;
+        ['1', '2', '3'].forEach(s => {
+            (aff[s] || []).forEach(uai => {
+                if (!lyceesBySecteur[s].includes(uai)) lyceesBySecteur[s].push(uai);
+            });
+        });
+    });
+    return { colleges, lyceesBySecteur };
+}
+
 function renderMarkersMode(sector, mode) {
     if (!sector) {
         map.flyTo({ center: [lastSearch.lng, lastSearch.lat], zoom: 17 });
         return;
     }
 
-    const uais = typeof sector.properties.uais === 'string'
-        ? JSON.parse(sector.properties.uais)
-        : sector.properties.uais;
+    const { colleges, lyceesBySecteur } = getAffectationData(sector);
 
     const bounds = new maplibregl.LngLatBounds();
     bounds.extend([lastSearch.lng, lastSearch.lat]);
@@ -193,16 +209,12 @@ function renderMarkersMode(sector, mode) {
     const collegeCoordKeys = new Set();
 
     if (mode === 'both') {
-        uais.forEach(collegeUai => {
-            const school = schoolsData[collegeUai];
-            if (!school || !school.lng || !school.lat) return;
-
+        colleges.forEach(school => {
+            if (!school.lng || !school.lat) return;
             collegeCoordKeys.add(`${school.lng},${school.lat}`);
-
             const el = createCircleMarker(COLORS_AFFECTATION.college);
             attachMarkerPopup(el, [school.lng, school.lat],
                 infoCol(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention));
-
             const marker = new maplibregl.Marker({ element: el })
                 .setLngLat([school.lng, school.lat])
                 .addTo(map);
@@ -210,20 +222,6 @@ function renderMarkersMode(sector, mode) {
             bounds.extend([school.lng, school.lat]);
         });
     }
-
-    // Union lycée affectation for all college UAIs in sector
-    const lyceesBySecteur = { '1': [], '2': [], '3': [] };
-    uais.forEach(collegeUai => {
-        const aff = lyceeAffectation[collegeUai];
-        if (!aff) return;
-        ['1', '2', '3'].forEach(s => {
-            (aff[s] || []).forEach(uai => {
-                if (!lyceesBySecteur[s].includes(uai)) {
-                    lyceesBySecteur[s].push(uai);
-                }
-            });
-        });
-    });
 
     const secteurColors = {
         '1': COLORS_AFFECTATION.lycee1,
@@ -235,11 +233,9 @@ function renderMarkersMode(sector, mode) {
         lyceesBySecteur[s].forEach(uai => {
             const school = schoolsData[uai];
             if (!school || !school.lng || !school.lat) return;
-
             const el = createCircleMarker(secteurColors[s]);
             attachMarkerPopup(el, [school.lng, school.lat],
                 infoLyc(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention));
-
             const overlapsCollege = collegeCoordKeys.has(`${school.lng},${school.lat}`);
             const marker = new maplibregl.Marker({ element: el, ...(overlapsCollege ? { offset: [20, 0] } : {}) })
                 .setLngLat([school.lng, school.lat])
@@ -255,6 +251,10 @@ function renderMarkersMode(sector, mode) {
 
 function renderSearchResult() {
     if (!lastSearch) return;
+
+    listViewActive = false;
+    hideListPanel();
+    syncListToggleButtons();
 
     clearTimeout(_hoverCloseTimer);
     clearPopups();
@@ -275,6 +275,7 @@ function renderSearchResult() {
 
     if (!activeSearchMode) {
         map.flyTo({ center: [lng, lat], zoom: 15 });
+        showListToggle();
         return;
     }
 
@@ -285,6 +286,131 @@ function renderSearchResult() {
     } else {
         renderMarkersMode(sector, activeSearchMode);
     }
+
+    showListToggle();
+}
+
+// ====================================
+// List View
+// ====================================
+
+function listCardHtml(school, borderColor, examLabel) {
+    const borderStyle = borderColor ? `border-left: 4px solid ${borderColor};` : '';
+    const hasResults = school.txreussite != null;
+    const resultsHtml = hasResults
+        ? `<div class="list-card-rates">
+             <span>R\u00e9ussite&#160;<b>${formatRate(school.txreussite)}</b></span>
+             <span>Mentions&#160;<b>${formatRate(school.txmention)}</b></span>
+           </div>
+           <p class="list-card-exam-label">R\u00e9sultats ${escapeHtml(examLabel)} 2024</p>` : '';
+    return `<div class="list-card" style="${borderStyle}">
+      <p class="list-card-name">${escapeHtml(school.nom)}</p>
+      <p class="list-card-type">${escapeHtml(formatSchoolType(school.nature_uai_libe))}</p>
+      <p class="list-card-address">${escapeHtml(school.adresse)}, ${escapeHtml(school.code_postal)} Paris</p>
+      ${resultsHtml}
+    </div>`;
+}
+
+function buildListHtml(data, mode) {
+    const effectiveMode = mode || 'both';
+    mode = effectiveMode;
+    let html = '';
+    const secteurColors = {
+        '1': COLORS_AFFECTATION.lycee1,
+        '2': COLORS_AFFECTATION.lycee2,
+        '3': COLORS_AFFECTATION.lycee3
+    };
+    const secteurLabels = {
+        '1': 'Lyc\u00e9es \u2014 secteur 1',
+        '2': 'Lyc\u00e9es \u2014 secteur 2',
+        '3': 'Lyc\u00e9es \u2014 secteur 3'
+    };
+
+    if (mode === 'colleges' || mode === 'both') {
+        const borderColor = mode === 'both' ? COLORS_AFFECTATION.college : null;
+        html += `<div class="list-section-header" style="border-left: 4px solid ${COLORS_AFFECTATION.college};">Coll\u00e8ge</div>`;
+        if (data.colleges.length === 0) {
+            html += `<div class="list-card"><p class="list-card-name" style="color:#999">Aucun coll\u00e8ge trouv\u00e9</p></div>`;
+        } else {
+            data.colleges.forEach(school => {
+                html += listCardHtml(school, borderColor, 'brevet');
+            });
+        }
+    }
+
+    if (mode === 'both' || mode === 'lycees') {
+        ['1', '2', '3'].forEach(s => {
+            if (data.lyceesBySecteur[s].length === 0) return;
+            html += `<div class="list-section-header" style="border-left: 4px solid ${secteurColors[s]};">${secteurLabels[s]}</div>`;
+            data.lyceesBySecteur[s].forEach(uai => {
+                const school = schoolsData[uai];
+                if (!school) return;
+                html += listCardHtml(school, secteurColors[s], 'bac');
+            });
+        });
+    }
+
+    return html || `<div class="list-card"><p class="list-card-name" style="color:#999">Aucune donn\u00e9e disponible</p></div>`;
+}
+
+function showListPanel(html) {
+    if (isMobile()) {
+        document.getElementById('list-panel-mobile-content').innerHTML = html;
+        document.getElementById('list-panel-mobile').classList.add('open');
+        requestAnimationFrame(() => document.getElementById('list-panel-backdrop').classList.add('open'));
+    } else {
+        document.getElementById('list-panel-desktop-content').innerHTML = html;
+        document.getElementById('list-panel-desktop').classList.remove('hidden');
+    }
+}
+
+function hideListPanel() {
+    document.getElementById('list-panel-desktop').classList.add('hidden');
+    document.getElementById('list-panel-mobile').classList.remove('open');
+    document.getElementById('list-panel-backdrop').classList.remove('open');
+}
+
+function showListToggle() {
+    document.getElementById('list-toggle-desktop').classList.remove('hidden');
+    document.getElementById('list-toggle-mobile').classList.remove('hidden');
+}
+
+function hideListToggle() {
+    listViewActive = false;
+    hideListPanel();
+    document.getElementById('list-toggle-desktop').classList.add('hidden');
+    document.getElementById('list-toggle-mobile').classList.add('hidden');
+}
+
+function syncListToggleButtons() {
+    ['list-toggle-desktop', 'list-toggle-mobile'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        btn.querySelector('i').className = listViewActive ? 'fa fa-map' : 'fa fa-list';
+        btn.title = listViewActive ? 'Voir la carte' : 'Voir la liste';
+        btn.classList.toggle('active', listViewActive);
+    });
+}
+
+function toggleListView() {
+    listViewActive = !listViewActive;
+    syncListToggleButtons();
+    if (!listViewActive) { hideListPanel(); return; }
+    const sector = findSectorForPoint(lastSearch.lng, lastSearch.lat);
+    showListPanel(buildListHtml(getAffectationData(sector), activeSearchMode));
+}
+
+function setupListView() {
+    document.getElementById('list-sheet-close-btn')?.addEventListener('click', () => {
+        listViewActive = false;
+        syncListToggleButtons();
+        hideListPanel();
+    });
+    document.getElementById('list-panel-backdrop')?.addEventListener('click', () => {
+        listViewActive = false;
+        syncListToggleButtons();
+        hideListPanel();
+    });
 }
 
 function getAutocompleteConfig() {
@@ -367,5 +493,10 @@ function setupAddressSearch() {
                 b.classList.toggle('active', b.dataset.mode === activeSearchMode));
             renderSearchResult();
         });
+    });
+
+    // Wire list toggle buttons
+    ['list-toggle-desktop', 'list-toggle-mobile'].forEach(id => {
+        document.getElementById(id)?.addEventListener('click', toggleListView);
     });
 }

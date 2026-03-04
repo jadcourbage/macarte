@@ -305,38 +305,24 @@ input[type="radio"], input[type="checkbox"] {
     pointer-events: auto;
   }
 
-  /* Mobile filter bar */
-  #search-filters-mobile {
-    border-top: none;
-    padding: 6px 0 0;
-  }
-  #search-filters-mobile .filter-btn {
-    background: rgba(255,255,255,0.95);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-  }
-  #search-filters-mobile .filter-label {
-    background: none;
-    box-shadow: none;
-    border-radius: 0;
-    padding: 0 4px 0 0;
-    text-shadow: 0 1px 3px rgba(255,255,255,0.85);
-  }
-
-  /* Mobile search bar */
+  /* Mobile search bar — white card matching desktop */
   #mobile-search {
     position: fixed;
     top: 10px;
     left: 12px;
     right: 12px;
     z-index: 1000;
-    background: transparent;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
   }
   #mobile-search .mobile-search-wrapper {
     display: flex;
     align-items: center;
-    background: #fff;
-    border-radius: 28px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
     padding-right: 12px;
   }
   #mobile-search .mobile-search-wrapper .search-clear-btn {
@@ -345,9 +331,9 @@ input[type="radio"], input[type="checkbox"] {
   }
   #mobile-search .form-control {
     box-shadow: none;
-    border-radius: 28px;
+    border-radius: 0;
     padding: 10px 18px;
-    height: 44px;
+    height: 48px;
     font-size: 16px; /* Prevents iOS zoom on focus */
     border: none;
     background-color: transparent;
@@ -357,8 +343,16 @@ input[type="radio"], input[type="checkbox"] {
     box-shadow: none;
     outline: none;
   }
-  #mobile-search .mobile-search-wrapper:focus-within {
-    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+  /* Mobile filter bar — inherits card style from parent */
+  #search-filters-mobile {
+    padding: 8px 12px;
+  }
+  #search-filters-mobile .filter-btn {
+    background: #fff;
+    box-shadow: none;
+  }
+  #search-filters-mobile .filter-label {
+    text-shadow: none;
   }
 
   /* Larger touch-friendly map controls */
@@ -628,6 +622,7 @@ input[type="radio"], input[type="checkbox"] {
    ==================================== */
 .search-filters {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
@@ -635,18 +630,16 @@ input[type="radio"], input[type="checkbox"] {
 }
 
 .filter-label {
+  flex: 0 0 100%;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: #3c3c3c;
-  white-space: nowrap;
-  flex-shrink: 0;
 }
 
 .filter-btn {
-  flex: auto;
-  min-width: 0;
+  flex-shrink: 0;
   padding: 5px 10px;
   font-size: 13px;
   border: 1px solid #dadce0;
@@ -729,4 +722,167 @@ input[type="radio"], input[type="checkbox"] {
   border: 1.5px solid white;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
   flex-shrink: 0;
+}
+
+/* ====================================
+   List View Toggle & Panel
+   ==================================== */
+.list-toggle-btn {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid #4A7FB5;
+  border-radius: 50%;
+  background: #fff;
+  color: #4A7FB5;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.list-toggle-btn:hover {
+  background: #e8f0fe;
+}
+
+.list-toggle-btn.active {
+  background: #e8f0fe;
+  color: #1a73e8;
+  border-color: #1a73e8;
+}
+
+.list-panel {
+  background: #fff;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.12);
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  border-top: 1px solid #e8eaed;
+}
+
+.list-section-header {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #f8f9fa;
+  padding: 10px 14px 4px;
+  color: #5f6368;
+}
+
+.list-card {
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.list-card-name {
+  margin: 0 0 2px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #202124;
+}
+
+.list-card-type {
+  margin: 0 0 2px;
+  font-size: 11px;
+  color: #888;
+}
+
+.list-card-address {
+  margin: 0 0 4px;
+  font-size: 12px;
+  color: #555;
+}
+
+.list-card-rates {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  margin: 0 0 2px;
+}
+
+.list-card-exam-label {
+  margin: 0;
+  font-size: 10px;
+  color: #999;
+}
+
+/* Mobile list bottom sheet */
+#list-panel-mobile {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.15);
+  max-height: 70vh;
+  z-index: 1050;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  overflow: hidden;
+}
+
+#list-panel-mobile.open {
+  transform: translateY(0);
+}
+
+.list-sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: #dadce0;
+  border-radius: 2px;
+  margin: 10px auto 6px;
+}
+
+.list-sheet-close {
+  position: absolute;
+  top: 6px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: #5f6368;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.list-sheet-content {
+  overflow-y: auto;
+  max-height: calc(70vh - 40px);
+  padding-bottom: 16px;
+}
+
+.list-panel-backdrop-el {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 1040;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  display: none;
+}
+
+.list-panel-backdrop-el.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 767px) {
+  .list-panel-backdrop-el {
+    display: block;
+  }
+  #list-panel-desktop {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  #list-panel-mobile {
+    display: none !important;
+  }
 }
