@@ -270,6 +270,11 @@ function renderSearchResult() {
         .addTo(map);
     activeMarkers.push(locationMarker);
 
+    if (!activeSearchMode) {
+        map.flyTo({ center: [lng, lat], zoom: 15 });
+        return;
+    }
+
     const sector = findSectorForPoint(lng, lat);
 
     if (activeSearchMode === 'colleges') {
