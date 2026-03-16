@@ -68,6 +68,14 @@ function attachMarkerPopup(el, lngLat, html) {
 let _geocodeTimer = null;
 let _hoverCloseTimer = null;
 
+function setSearchLoading(loading) {
+    document.querySelectorAll('.search-icon').forEach(el => {
+        el.className = loading
+            ? 'fa fa-spinner fa-spin search-icon'
+            : 'fa fa-search search-icon';
+    });
+}
+
 function showSearchFilters() {
     // Set sectorisation year in tab (uses metadata if loaded, else default)
     document.querySelectorAll('.mode-tab[data-mode-tab="secteur"]').forEach(t => {
@@ -542,29 +550,35 @@ function getAutocompleteConfig() {
             const term = request.term.trim();
             if (term.length < 3) { response([]); return; }
             clearTimeout(_geocodeTimer);
-            _geocodeTimer = setTimeout(function() { $.ajax({
-                url: "https://data.geopf.fr/geocodage/search",
-                dataType: "json",
-                data: {
-                    'q': term,
-                    'index': 'address',
-                    'citycode': '75056',
-                    'limit': 5
-                },
-                success: function(data) {
-                    $.each(data.features, function(key, value) {
-                        this.properties.lon = value.geometry.coordinates[0];
-                        this.properties.lat = value.geometry.coordinates[1];
-                        this.properties.label = value.properties.label;
-                    });
+            _geocodeTimer = setTimeout(function() {
+                setSearchLoading(true);
+                $.ajax({
+                    url: "https://data.geopf.fr/geocodage/search",
+                    dataType: "json",
+                    data: {
+                        'q': term,
+                        'index': 'address',
+                        'citycode': '75056',
+                        'limit': 5
+                    },
+                    success: function(data) {
+                        $.each(data.features, function(key, value) {
+                            this.properties.lon = value.geometry.coordinates[0];
+                            this.properties.lat = value.geometry.coordinates[1];
+                            this.properties.label = value.properties.label;
+                        });
 
-                    var arr = $.map(data.features, function(key, value) {
-                        return key.properties;
-                    });
+                        var arr = $.map(data.features, function(key, value) {
+                            return key.properties;
+                        });
 
-                    response(arr);
-                }
-            }); }, 250);
+                        response(arr);
+                    },
+                    complete: function() {
+                        setSearchLoading(false);
+                    }
+                });
+            }, 250);
         },
         minLength: 3,
         select: function(event, ui) {

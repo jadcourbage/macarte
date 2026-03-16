@@ -329,10 +329,16 @@ input[type="radio"], input[type="checkbox"] {
     font-size: 22px;
     padding: 0;
   }
+  #mobile-search .search-icon {
+    color: #5f6368;
+    font-size: 16px;
+    margin-left: 14px;
+    flex-shrink: 0;
+  }
   #mobile-search .form-control {
     box-shadow: none;
     border-radius: 0;
-    padding: 10px 18px;
+    padding: 10px 18px 10px 10px;
     height: 48px;
     font-size: 16px; /* Prevents iOS zoom on focus */
     border: none;
