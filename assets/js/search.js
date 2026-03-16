@@ -299,10 +299,11 @@ function formatDist(km) {
     return km.toFixed(1).replace('.', ',') + '\u00a0km';
 }
 
-function listCardHtml(school, borderColor, examLabel, distance) {
+function listCardHtml(school, borderColor, examLabel, distance, uai) {
     const borderStyle = borderColor ? `border-left: 4px solid ${borderColor};` : '';
     const coordAttrs = (school.lng != null && school.lat != null)
         ? ` data-lng="${school.lng}" data-lat="${school.lat}"` : '';
+    const uaiAttr = uai ? ` data-uai="${uai}"` : '';
     const distHtml = distance != null
         ? ` <span class="list-card-dist">(${formatDist(distance)})</span>` : '';
     const hasResults = school.txreussite != null;
@@ -313,7 +314,7 @@ function listCardHtml(school, borderColor, examLabel, distance) {
              <span>Mentions&#160;<b>${formatRate(school.txmention)}</b></span>
            </div>
            <p class="list-card-exam-label">R\u00e9sultats ${escapeHtml(examLabel)} ${examYear}</p>` : '';
-    return `<div class="list-card" style="${borderStyle}"${coordAttrs}>
+    return `<div class="list-card" style="${borderStyle}"${coordAttrs}${uaiAttr}>
       <p class="list-card-name">${escapeHtml(school.nom)}${distHtml}</p>
       <p class="list-card-type">${escapeHtml(formatSchoolType(school.nature_uai_libe))}</p>
       <p class="list-card-address">${escapeHtml(school.adresse)}, ${escapeHtml(school.code_postal)} Paris</p>
@@ -349,7 +350,8 @@ function buildListHtml(data, mode) {
         } else {
             [...data.colleges].sort((a, b) => distFrom(a) - distFrom(b)).forEach(school => {
                 const d = distFrom(school);
-                html += listCardHtml(school, borderColor, 'brevet', isFinite(d) ? d : null);
+                const uai = Object.keys(schoolsData).find(k => schoolsData[k] === school);
+                html += listCardHtml(school, borderColor, 'brevet', isFinite(d) ? d : null, uai);
             });
         }
     }
@@ -364,12 +366,30 @@ function buildListHtml(data, mode) {
                     const school = schoolsData[uai];
                     if (!school) return;
                     const d = distFrom(school);
-                    html += listCardHtml(school, secteurColors[s], 'bac', isFinite(d) ? d : null);
+                    html += listCardHtml(school, secteurColors[s], 'bac', isFinite(d) ? d : null, uai);
                 });
         });
     }
 
     return html || `<div class="list-card"><p class="list-card-name" style="color:#999">Aucune donn\u00e9e disponible</p></div>`;
+}
+
+function placeSelectedSchoolMarker(uai, lng, lat) {
+    clearSelectedSchoolMarker();
+    const school = schoolsData[uai];
+    if (!school) return;
+    const isCollege = school.nature_uai === 340;
+    const el = createPinMarker('school');
+    const html = isCollege
+        ? infoCol(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention, school.brevet_session)
+        : infoLyc(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention, school.bac_annee);
+    const popup = new maplibregl.Popup({ closeOnClick: false, offset: 38 })
+        .setHTML(html);
+    selectedSchoolMarker = new maplibregl.Marker({ element: el, anchor: 'bottom' })
+        .setLngLat([lng, lat])
+        .setPopup(popup)
+        .addTo(map);
+    selectedSchoolMarker.togglePopup();
 }
 
 function attachListHoverHandlers() {
@@ -396,10 +416,20 @@ function attachListHoverHandlers() {
     document.querySelectorAll('#list-panel-desktop-content .list-card[data-lng]').forEach(card => {
         const lng = parseFloat(card.dataset.lng);
         const lat = parseFloat(card.dataset.lat);
+        const uai = card.dataset.uai;
         card.addEventListener('mouseenter', () => highlightAtCoords(lng, lat));
         card.addEventListener('mouseleave', clearHighlight);
         card.addEventListener('click', () => {
-            highlightAtCoords(lng, lat);
+            const existingMarker = activeMarkers.find(m => {
+                const pos = m.getLngLat();
+                return Math.abs(pos.lng - lng) < 0.00005 && Math.abs(pos.lat - lat) < 0.00005;
+            });
+            if (existingMarker) {
+                highlightAtCoords(lng, lat);
+                clearSelectedSchoolMarker();
+            } else if (uai) {
+                placeSelectedSchoolMarker(uai, lng, lat);
+            }
             map.flyTo({ center: [lng, lat], zoom: 16, speed: 1.5 });
         });
     });
@@ -417,11 +447,27 @@ function refitBoundsForListPanel() {
     });
 }
 
+function attachMobileListClickHandlers() {
+    document.querySelectorAll('#list-panel-mobile-content .list-card[data-lng]').forEach(card => {
+        const lng = parseFloat(card.dataset.lng);
+        const lat = parseFloat(card.dataset.lat);
+        const uai = card.dataset.uai;
+        card.addEventListener('click', () => {
+            hideListPanel();
+            listViewActive = false;
+            syncListToggleButtons();
+            if (uai) placeSelectedSchoolMarker(uai, lng, lat);
+            map.flyTo({ center: [lng, lat], zoom: 16, speed: 1.5 });
+        });
+    });
+}
+
 function showListPanel(html) {
     if (isMobile()) {
         document.getElementById('list-panel-mobile-content').innerHTML = html;
         document.getElementById('list-panel-mobile').classList.add('open');
         requestAnimationFrame(() => document.getElementById('list-panel-backdrop').classList.add('open'));
+        attachMobileListClickHandlers();
     } else {
         document.getElementById('list-panel-desktop-content').innerHTML = html;
         document.getElementById('list-panel-desktop').classList.remove('hidden');
@@ -453,7 +499,7 @@ function syncListToggleButtons() {
         const btn = document.getElementById(id);
         if (!btn) return;
         btn.querySelector('i').className = listViewActive ? 'fa fa-map' : 'fa fa-list';
-        btn.title = listViewActive ? 'Voir la carte' : 'Voir la liste';
+        btn.childNodes[btn.childNodes.length - 1].textContent = listViewActive ? ' Carte' : ' Liste';
         btn.classList.toggle('active', listViewActive);
     });
 }

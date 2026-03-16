@@ -4,6 +4,7 @@
 let map;
 let siteMetadata = null;
 let schoolsData = null;   // keyed by UAI
+let selectedSchoolMarker = null; // temporary marker placed on list-card click
 let sectorsData = null;   // college sector GeoJSON (polygons only)
 let activePopups = [];
 let activeRoutes = [];

@@ -35,6 +35,11 @@ function setupEventHandlers() {
             clearLegend();
             hideListToggle();
             if (locationMarker) { locationMarker.remove(); locationMarker = null; }
+            lastSearch = null;
+            activeSearchMode = null;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('search-filters').classList.add('hidden');
+            document.getElementById('search-filters-mobile').classList.add('hidden');
             input.focus();
         });
     }

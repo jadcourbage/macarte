@@ -23,6 +23,14 @@ function clearRoutes() {
 function clearMarkers() {
     activeMarkers.forEach(marker => marker.remove());
     activeMarkers = [];
+    clearSelectedSchoolMarker();
+}
+
+function clearSelectedSchoolMarker() {
+    if (selectedSchoolMarker) {
+        selectedSchoolMarker.remove();
+        selectedSchoolMarker = null;
+    }
 }
 
 // Set college sector style
