@@ -69,6 +69,10 @@ let _geocodeTimer = null;
 let _hoverCloseTimer = null;
 
 function showSearchFilters() {
+    // Set sectorisation year in tab (uses metadata if loaded, else default)
+    document.querySelectorAll('.mode-tab[data-mode-tab="secteur"]').forEach(t => {
+        t.textContent = `Sectorisation ${getMeta('secto_year')}`;
+    });
     document.getElementById('search-filters').classList.remove('hidden');
     document.getElementById('search-filters-mobile').classList.remove('hidden');
     if (isMobile()) {
@@ -249,45 +253,50 @@ function renderMarkersMode(sector, mode) {
     map.fitBounds(bounds, { padding: 60 });
 }
 
-function renderSearchResult() {
-    if (!lastSearch) return;
-
-    listViewActive = false;
-    hideListPanel();
-    syncListToggleButtons();
-
+function placeHomePin(lng, lat, label) {
     clearTimeout(_hoverCloseTimer);
     clearPopups();
     clearMarkers();
     clearRoutes();
     clearLegend();
     locationMarker = null;
-
-    const { lng, lat } = lastSearch;
-
-    // Place home pin
     const el = createPinMarker('home');
     locationMarker = new maplibregl.Marker({ element: el, anchor: 'bottom' })
         .setLngLat([lng, lat])
-        .setPopup(new maplibregl.Popup().setHTML(escapeHtml(lastSearch.label)))
+        .setPopup(new maplibregl.Popup().setHTML(escapeHtml(label)))
         .addTo(map);
     activeMarkers.push(locationMarker);
+}
+
+function showSecteurListToggle() { showListToggle(); }
+
+function renderSearchResult() {
+    if (!lastSearch) return;
+
+    listViewActive = false;
+    hideListPanel();
+    syncAllListToggleButtons();
+
+    const { lng, lat, label } = lastSearch;
+    placeHomePin(lng, lat, label);
+
+    if (advSearchActive) {
+        applyAdvancedFilters();
+        return;
+    }
 
     if (!activeSearchMode) {
         map.flyTo({ center: [lng, lat], zoom: 15 });
-        showListToggle();
+        showSecteurListToggle();
         return;
     }
 
     const sector = findSectorForPoint(lng, lat);
+    activeSearchMode === 'colleges'
+        ? renderCollegesMode(sector, lng, lat)
+        : renderMarkersMode(sector, activeSearchMode);
 
-    if (activeSearchMode === 'colleges') {
-        renderCollegesMode(sector, lng, lat);
-    } else {
-        renderMarkersMode(sector, activeSearchMode);
-    }
-
-    showListToggle();
+    showSecteurListToggle();
 }
 
 // ====================================
@@ -455,7 +464,7 @@ function attachMobileListClickHandlers() {
         card.addEventListener('click', () => {
             hideListPanel();
             listViewActive = false;
-            syncListToggleButtons();
+            syncAllListToggleButtons();
             if (uai) placeSelectedSchoolMarker(uai, lng, lat);
             map.flyTo({ center: [lng, lat], zoom: 16, speed: 1.5 });
         });
@@ -506,7 +515,7 @@ function syncListToggleButtons() {
 
 function toggleListView() {
     listViewActive = !listViewActive;
-    syncListToggleButtons();
+    syncAllListToggleButtons();
     if (!listViewActive) { hideListPanel(); return; }
     const sector = findSectorForPoint(lastSearch.lng, lastSearch.lat);
     showListPanel(buildListHtml(getAffectationData(sector), activeSearchMode));
@@ -515,12 +524,12 @@ function toggleListView() {
 function setupListView() {
     document.getElementById('list-sheet-close-btn')?.addEventListener('click', () => {
         listViewActive = false;
-        syncListToggleButtons();
+        syncAllListToggleButtons();
         hideListPanel();
     });
     document.getElementById('list-panel-backdrop')?.addEventListener('click', () => {
         listViewActive = false;
-        syncListToggleButtons();
+        syncAllListToggleButtons();
         hideListPanel();
     });
 }

@@ -40,6 +40,9 @@ function setupEventHandlers() {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('search-filters').classList.add('hidden');
             document.getElementById('search-filters-mobile').classList.add('hidden');
+            if (advSearchActive) resetAdvancedMode();
+            advSearchState = { type: 'college', maxDist: null, sectors: [], minReussite: 50, minMention: 0 };
+            _lastAdvResults = [];
             input.focus();
         });
     }
@@ -53,4 +56,5 @@ $(document).ready(function() {
     initMap();
     setupAddressSearch();
     setupEventHandlers();
+    initAdvancedSearch();
 });

@@ -16,6 +16,11 @@ let lyceeAffectation = null;   // { college_uai: { "1": [...], "2": [...], "3": 
 let lastSearch = null;          // { lng, lat, label }
 let activeSearchMode = null; // null | 'colleges' | 'both' | 'lycees'
 let listViewActive = false;
+let advSearchActive = false;
+let advSearchState = { type: 'college', maxDist: null, sectors: [], minReussite: 50, minMention: 0 };
+let advSearchMarkers = [];
+let _lastAdvResults = [];
+let advSearchDebounceTimer = null;
 
 const METADATA_DEFAULTS = { secto_year: '2025-2026', brevet_session: 2024, bac_annee: 2024 };
 function getMeta(key) { return (siteMetadata && siteMetadata[key] != null) ? siteMetadata[key] : METADATA_DEFAULTS[key]; }

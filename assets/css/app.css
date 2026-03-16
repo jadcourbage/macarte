@@ -855,9 +855,9 @@ input[type="radio"], input[type="checkbox"] {
   border-radius: 16px 16px 0 0;
   box-shadow: 0 -2px 12px rgba(0,0,0,0.15);
   max-height: 70vh;
-  z-index: 1050;
+  z-index: 1060; /* above advsearch filter sheet (1050) */
   transform: translateY(100%);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
   overflow: hidden;
 }
 
@@ -896,7 +896,7 @@ input[type="radio"], input[type="checkbox"] {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.4);
-  z-index: 1040;
+  z-index: 1055; /* between advsearch sheet (1050) and list panel (1060) */
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -920,5 +920,300 @@ input[type="radio"], input[type="checkbox"] {
 @media (min-width: 768px) {
   #list-panel-mobile {
     display: none !important;
+  }
+}
+
+/* ====================================
+   Mode Tab Strip
+   ==================================== */
+.mode-tab-strip {
+  flex: 0 0 100%;
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid #e8eaed;
+  margin: -8px -12px 4px;
+  padding: 0 4px;
+}
+
+.mode-tab {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #5f6368;
+  cursor: pointer;
+  white-space: nowrap;
+  margin-bottom: -1px;
+}
+
+.mode-tab:hover {
+  color: #202124;
+  background: #f1f3f4;
+}
+
+.mode-tab.active {
+  color: #1a73e8;
+  border-bottom-color: #1a73e8;
+  font-weight: 600;
+}
+
+/* ====================================
+   Secteur Filters Panel
+   ==================================== */
+.secteur-filters-panel {
+  flex: 0 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ====================================
+   Advanced Search Panel
+   ==================================== */
+.advsearch-panel {
+  flex: 0 0 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.advsearch-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.advsearch-label {
+  flex: 0 0 90px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5f6368;
+}
+
+.advsearch-type-btn,
+.advsearch-sector-btn {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  font-size: 12px;
+  border: 1px solid #dadce0;
+  border-radius: 14px;
+  background: #fff;
+  color: #5f6368;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.advsearch-type-btn.active,
+.advsearch-sector-btn.active {
+  background: #e8f0fe;
+  border-color: #4A7FB5;
+  color: #1a73e8;
+  font-weight: 600;
+}
+
+.advsearch-select {
+  font-size: 12px;
+  padding: 4px 6px;
+  border: 1px solid #dadce0;
+  border-radius: 6px;
+  background: #fff;
+  color: #202124;
+  max-width: 160px;
+  cursor: pointer;
+}
+
+.advsearch-slider {
+  flex: 1;
+  min-width: 0;
+  height: 4px;
+  accent-color: #4A7FB5;
+  cursor: pointer;
+  touch-action: pan-x;
+}
+
+.advsearch-slider-val {
+  font-size: 12px;
+  color: #5f6368;
+  min-width: 32px;
+  text-align: right;
+}
+
+.advsearch-counter {
+  flex: 1;
+  font-size: 11px;
+  font-style: italic;
+  color: #9aa0a6;
+}
+
+/* ====================================
+   Advsearch Legend
+   ==================================== */
+#advsearch-legend {
+  position: fixed;
+  bottom: 28px;
+  left: 16px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  padding: 8px 12px;
+  font-size: 12px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* ====================================
+   Distance discrete slider
+   ==================================== */
+.advsearch-dist-row {
+  flex-wrap: wrap;
+}
+
+.advsearch-dist-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.advsearch-dist-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #9aa0a6;
+  padding: 0 1px;
+  user-select: none;
+}
+
+.advsearch-dist-slider {
+  width: 100%;
+}
+
+/* ====================================
+   Mobile: advsearch status bar
+   ==================================== */
+.advsearch-status {
+  flex: 0 0 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.advsearch-filters-toggle-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1.5px solid #4A7FB5;
+  border-radius: 14px;
+  background: #fff;
+  color: #4A7FB5;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.advsearch-filters-toggle-btn:hover {
+  background: #e8f0fe;
+}
+
+.advsearch-filters-toggle-btn.sheet-open {
+  background: #4A7FB5;
+  color: #fff;
+}
+
+/* ====================================
+   Mobile: advsearch filter sheet
+   ==================================== */
+.advsearch-sheet {
+  display: none; /* desktop: never shown */
+}
+
+@media (max-width: 767px) {
+  .advsearch-sheet {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.15);
+    max-height: 65vh;
+    z-index: 1050; /* below list sheet (1060) so list opens on top */
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    overflow: hidden;
+  }
+
+  .advsearch-sheet.open {
+    transform: translateY(0);
+  }
+
+  .advsearch-sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: #dadce0;
+    border-radius: 2px;
+    margin: 10px auto 4px;
+  }
+
+  .advsearch-sheet-statusbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px 8px;
+    border-bottom: 1px solid #e8eaed;
+  }
+
+  .advsearch-sheet-statusbar .advsearch-counter {
+    flex: 1;
+  }
+
+  .advsearch-sheet-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    color: #5f6368;
+    cursor: pointer;
+    padding: 2px 4px;
+    flex-shrink: 0;
+  }
+
+  .advsearch-sheet-filters {
+    padding: 12px 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    /* No overflow-y:auto + no mask-image: both can hijack touch events
+       on iOS Safari, breaking range slider interaction */
+  }
+
+  .advsearch-sheet-filters .advsearch-row {
+    gap: 8px;
+  }
+
+  .advsearch-sheet-filters .advsearch-label {
+    flex: 0 0 90px;
+    font-size: 11px;
+  }
+
+  .advsearch-sheet-filters .advsearch-slider {
+    flex: 1;
+    /* touch-action:none lets the range input own all touch gestures;
+       pan-x is insufficient inside a scroll container on iOS Safari */
+    touch-action: none;
   }
 }

@@ -67,12 +67,26 @@
       <button id="clear-mobile" class="search-clear-btn hidden" title="Effacer">×</button>
     </div>
     <div id="search-filters-mobile" class="search-filters hidden">
-      <span class="filter-label">Sectorisation (2025-2026) :</span>
-      <button class="filter-btn" data-mode="colleges">Collège</button>
-      <button class="filter-btn" data-mode="lycees">Lycées</button>
-      <button id="list-toggle-mobile" class="list-toggle-btn hidden">
-        <i class="fa fa-list"></i> Liste
-      </button>
+      <div class="mode-tab-strip">
+        <button class="mode-tab active" data-mode-tab="secteur">Sectorisation</button>
+        <button class="mode-tab" data-mode-tab="advsearch">✦ Recherche avancée</button>
+      </div>
+      <div class="secteur-filters-panel" id="secteur-filters-mobile">
+        <button class="filter-btn" data-mode="colleges">Collège</button>
+        <button class="filter-btn" data-mode="lycees">Lycées</button>
+        <button id="list-toggle-mobile" class="list-toggle-btn hidden">
+          <i class="fa fa-list"></i> Liste
+        </button>
+      </div>
+      <div id="advsearch-status-mobile" class="advsearch-status hidden">
+        <span class="advsearch-counter" id="advsearch-counter-mobile"></span>
+        <button id="list-toggle-advsearch-mobile" class="list-toggle-btn hidden">
+          <i class="fa fa-list"></i> Liste
+        </button>
+        <button id="advsearch-filters-toggle" class="advsearch-filters-toggle-btn">
+          Filtres <i class="fa fa-chevron-up"></i>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -85,12 +99,52 @@
         <button id="clear-desktop" class="search-clear-btn hidden" title="Effacer">×</button>
       </div>
       <div id="search-filters" class="search-filters hidden">
-        <span class="filter-label">Sectorisation (2025-2026):</span>
-        <button class="filter-btn" data-mode="colleges">Collège</button>
-        <button class="filter-btn" data-mode="lycees">Lycées</button>
-        <button id="list-toggle-desktop" class="list-toggle-btn hidden">
-          <i class="fa fa-list"></i> Liste
-        </button>
+        <div class="mode-tab-strip">
+          <button class="mode-tab active" data-mode-tab="secteur">Sectorisation</button>
+          <button class="mode-tab" data-mode-tab="advsearch">✦ Recherche avancée</button>
+        </div>
+        <div class="secteur-filters-panel" id="secteur-filters-desktop">
+          <button class="filter-btn" data-mode="colleges">Collège</button>
+          <button class="filter-btn" data-mode="lycees">Lycées</button>
+          <button id="list-toggle-desktop" class="list-toggle-btn hidden">
+            <i class="fa fa-list"></i> Liste
+          </button>
+        </div>
+        <div id="advsearch-panel-desktop" class="advsearch-panel hidden">
+          <div class="advsearch-row">
+            <button class="advsearch-type-btn active" data-type="college">Collèges</button>
+            <button class="advsearch-type-btn" data-type="lycee">Lycées</button>
+          </div>
+          <div class="advsearch-row">
+            <button class="advsearch-sector-btn" data-sector="Public">Public</button>
+            <button class="advsearch-sector-btn" data-sector="Privé">Privé</button>
+          </div>
+          <div class="advsearch-row advsearch-dist-row">
+            <span class="advsearch-label">Distance</span>
+            <div class="advsearch-dist-wrap">
+              <input type="range" class="advsearch-slider advsearch-dist-slider" id="advsearch-dist-desktop" min="0" max="4" value="0" step="1">
+              <div class="advsearch-dist-labels">
+                <span>Toutes</span><span>500m</span><span>1km</span><span>2km</span><span>5km</span>
+              </div>
+            </div>
+          </div>
+          <div class="advsearch-row">
+            <span class="advsearch-label">Réussite min</span>
+            <input type="range" class="advsearch-slider" id="advsearch-reussite-desktop" min="50" max="100" value="50" step="1">
+            <span class="advsearch-slider-val" id="advsearch-reussite-val-desktop">50%</span>
+          </div>
+          <div class="advsearch-row">
+            <span class="advsearch-label">Mention min</span>
+            <input type="range" class="advsearch-slider" id="advsearch-mention-desktop" min="0" max="100" value="0" step="1">
+            <span class="advsearch-slider-val" id="advsearch-mention-val-desktop">0%</span>
+          </div>
+          <div class="advsearch-row">
+            <span class="advsearch-counter" id="advsearch-counter-desktop"></span>
+            <button id="list-toggle-advsearch-desktop" class="list-toggle-btn hidden">
+              <i class="fa fa-list"></i> Liste
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     <div id="list-panel-desktop" class="list-panel hidden">
@@ -106,6 +160,11 @@
   <div id="container">
     <div id="map"></div>
     <div id="results" />
+  </div>
+
+  <div id="advsearch-legend" class="hidden">
+    <div class="legend-item"><span class="legend-dot" style="background:#4A7FB5"></span> Public</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#C87533"></span> Privé</div>
   </div>
 
   <div id="affectation-legend" class="hidden">
@@ -140,17 +199,29 @@
           <div class="tab-content" id="aboutTabsContent">
             <div class="tab-pane fade active in" id="pres">
               <p><b>Carte interactive des secteurs scolaires des collèges et lycées de Paris.</b><br><br>
-                Tapez votre adresse dans le <b>moteur de recherche</b> <i class="fa fa-search"></i> pour identifier les établissements rattachés à votre domicile.<br>
-                Sélectionnez ensuite <b>Collège</b> et/ou <b>Lycées</b> pour afficher :<br><br>
+
+                <b>Sectorisation</b><br>
+                Tapez votre adresse dans le <b>moteur de recherche</b> <i class="fa fa-search"></i>, puis sélectionnez <b>Collège</b> et/ou <b>Lycées</b> pour afficher :<br><br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Collège</b> — votre collège de secteur avec l'itinéraire à pied<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Lycées</b> — les lycées auxquels votre collège est affecté<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Collège + Lycées</b> — les deux simultanément<br><br>
-                Cliquez sur le bouton <b>Liste</b> pour afficher la liste des établissements avec leurs résultats et la distance depuis votre adresse.<br><br>
+
+                <b>✦ Recherche avancée</b><br>
+                Après avoir saisi une adresse, basculez sur l'onglet <b>Recherche avancée</b> pour explorer tous les établissements parisiens selon vos critères :<br><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Type</b> — Collèges ou Lycées<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Secteur</b> — Public, Privé, ou les deux<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Distance</b> — dans un rayon de 500&nbsp;m à 5&nbsp;km<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Taux de réussite / mention minimum</b> — filtre par résultats d'examen<br><br>
+                Les établissements sont affichés en <span style="color:#4A7FB5;font-weight:600">bleu</span> (Public) et <span style="color:#C87533;font-weight:600">orange</span> (Privé), triés par distance.<br><br>
+
+                Cliquez sur <b>Liste</b> pour afficher la liste des établissements avec leurs résultats et la distance depuis votre adresse.<br><br>
+
                 Cliquez sur l'icône <i class="fa fa-map"></i> <b>Couches</b> (en haut à droite) pour choisir une visualisation des collèges :<br><br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Carte scolaire (sectorisation)<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Taux de réussite au <span data-label="brevet-year">Brevet 2024</span><br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Taux de mention au <span data-label="brevet-year">Brevet 2024</span><br><br>
-                Les <b>icônes</b> en haut et en bas à droite permettent de naviguer dans la carte :<br><br>
+
+                Les <b>icônes</b> en haut à droite permettent de naviguer dans la carte :<br><br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-map"></i>&nbsp;&nbsp;&nbsp;Couches (visualisations)<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-location-arrow"></i>&nbsp;&nbsp;&nbsp;Géolocalisation<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="glyphicon glyphicon-resize-full"></i>&nbsp;&nbsp;&nbsp;Vue globale de Paris<br>
@@ -245,6 +316,47 @@
   </div>
   <div id="list-panel-backdrop" class="list-panel-backdrop-el"></div>
 
+  <!-- Mobile advanced search filter sheet -->
+  <div id="advsearch-sheet-mobile" class="advsearch-sheet">
+    <div class="advsearch-sheet-handle"></div>
+    <div class="advsearch-sheet-statusbar">
+      <span class="advsearch-counter" id="advsearch-counter-sheet"></span>
+      <button id="list-toggle-advsearch-sheet" class="list-toggle-btn hidden">
+        <i class="fa fa-list"></i> Liste
+      </button>
+      <button class="advsearch-sheet-close" id="advsearch-sheet-close-btn" aria-label="Réduire">×</button>
+    </div>
+    <div class="advsearch-sheet-filters">
+      <div class="advsearch-row">
+        <button class="advsearch-type-btn active" data-type="college">Collèges</button>
+        <button class="advsearch-type-btn" data-type="lycee">Lycées</button>
+      </div>
+      <div class="advsearch-row">
+        <button class="advsearch-sector-btn" data-sector="Public">Public</button>
+        <button class="advsearch-sector-btn" data-sector="Privé">Privé</button>
+      </div>
+      <div class="advsearch-row advsearch-dist-row">
+        <span class="advsearch-label">Distance</span>
+        <div class="advsearch-dist-wrap">
+          <input type="range" class="advsearch-slider advsearch-dist-slider" id="advsearch-dist-mobile" min="0" max="4" value="0" step="1">
+          <div class="advsearch-dist-labels">
+            <span>Toutes</span><span>500m</span><span>1km</span><span>2km</span><span>5km</span>
+          </div>
+        </div>
+      </div>
+      <div class="advsearch-row">
+        <span class="advsearch-label">Réussite min</span>
+        <input type="range" class="advsearch-slider" id="advsearch-reussite-mobile" min="50" max="100" value="50" step="1">
+        <span class="advsearch-slider-val" id="advsearch-reussite-val-mobile">50%</span>
+      </div>
+      <div class="advsearch-row">
+        <span class="advsearch-label">Mention min</span>
+        <input type="range" class="advsearch-slider" id="advsearch-mention-mobile" min="0" max="100" value="0" step="1">
+        <span class="advsearch-slider-val" id="advsearch-mention-val-mobile">0%</span>
+      </div>
+    </div>
+  </div>
+
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
   <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
@@ -257,6 +369,7 @@
   <script src="assets/js/controls.js"></script>
   <script src="assets/js/map.js"></script>
   <script src="assets/js/search.js"></script>
+  <script src="assets/js/advsearch.js"></script>
   <script src="assets/js/app.js"></script>
   <link rel="stylesheet" href="assets/css/ui-custom.css">
 
