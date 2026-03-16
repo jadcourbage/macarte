@@ -2,6 +2,7 @@
 
 // Global state
 let map;
+let siteMetadata = null;
 let schoolsData = null;   // keyed by UAI
 let sectorsData = null;   // college sector GeoJSON (polygons only)
 let activePopups = [];
@@ -14,6 +15,9 @@ let lyceeAffectation = null;   // { college_uai: { "1": [...], "2": [...], "3": 
 let lastSearch = null;          // { lng, lat, label }
 let activeSearchMode = null; // null | 'colleges' | 'both' | 'lycees'
 let listViewActive = false;
+
+const METADATA_DEFAULTS = { secto_year: '2025-2026', brevet_session: 2024, bac_annee: 2024 };
+function getMeta(key) { return (siteMetadata && siteMetadata[key] != null) ? siteMetadata[key] : METADATA_DEFAULTS[key]; }
 
 // Paris bounds
 const parisBounds = [[2.27, 48.815], [2.42, 48.905]];

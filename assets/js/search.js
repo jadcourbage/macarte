@@ -154,7 +154,7 @@ function renderCollegesMode(sector, lng, lat) {
 
                     const popup = new maplibregl.Popup({ closeOnClick: false })
                         .setLngLat([etab.lng, etab.lat])
-                        .setHTML(infoColPath(etab.nom, etab.adresse, etab.code_postal, etab.nature_uai_libe, etab.txreussite, etab.txmention, time, length))
+                        .setHTML(infoColPath(etab.nom, etab.adresse, etab.code_postal, etab.nature_uai_libe, etab.txreussite, etab.txmention, time, length, etab.brevet_session))
                         .addTo(map);
                     activePopups.push(popup);
                     resolve();
@@ -163,7 +163,7 @@ function renderCollegesMode(sector, lng, lat) {
                     routeBounds.extend([etab.lng, etab.lat]);
                     const popup = new maplibregl.Popup({ closeOnClick: false })
                         .setLngLat([etab.lng, etab.lat])
-                        .setHTML(infoCol(etab.nom, etab.adresse, etab.code_postal, etab.nature_uai_libe, etab.txreussite, etab.txmention))
+                        .setHTML(infoCol(etab.nom, etab.adresse, etab.code_postal, etab.nature_uai_libe, etab.txreussite, etab.txmention, etab.brevet_session))
                         .addTo(map);
                     activePopups.push(popup);
                     resolve();
@@ -214,7 +214,7 @@ function renderMarkersMode(sector, mode) {
             collegeCoordKeys.add(`${school.lng},${school.lat}`);
             const el = createCircleMarker(COLORS_AFFECTATION.college);
             attachMarkerPopup(el, [school.lng, school.lat],
-                infoCol(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention));
+                infoCol(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention, school.brevet_session));
             const marker = new maplibregl.Marker({ element: el })
                 .setLngLat([school.lng, school.lat])
                 .addTo(map);
@@ -235,7 +235,7 @@ function renderMarkersMode(sector, mode) {
             if (!school || !school.lng || !school.lat) return;
             const el = createCircleMarker(secteurColors[s]);
             attachMarkerPopup(el, [school.lng, school.lat],
-                infoLyc(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention));
+                infoLyc(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention, school.bac_annee));
             const overlapsCollege = collegeCoordKeys.has(`${school.lng},${school.lat}`);
             const marker = new maplibregl.Marker({ element: el, ...(overlapsCollege ? { offset: [20, 0] } : {}) })
                 .setLngLat([school.lng, school.lat])
@@ -306,12 +306,13 @@ function listCardHtml(school, borderColor, examLabel, distance) {
     const distHtml = distance != null
         ? ` <span class="list-card-dist">(${formatDist(distance)})</span>` : '';
     const hasResults = school.txreussite != null;
+    const examYear = (examLabel === 'bac' ? school.bac_annee : school.brevet_session) || '';
     const resultsHtml = hasResults
         ? `<div class="list-card-rates">
              <span>R\u00e9ussite&#160;<b>${formatRate(school.txreussite)}</b></span>
              <span>Mentions&#160;<b>${formatRate(school.txmention)}</b></span>
            </div>
-           <p class="list-card-exam-label">R\u00e9sultats ${escapeHtml(examLabel)} 2024</p>` : '';
+           <p class="list-card-exam-label">R\u00e9sultats ${escapeHtml(examLabel)} ${examYear}</p>` : '';
     return `<div class="list-card" style="${borderStyle}"${coordAttrs}>
       <p class="list-card-name">${escapeHtml(school.nom)}${distHtml}</p>
       <p class="list-card-type">${escapeHtml(formatSchoolType(school.nature_uai_libe))}</p>

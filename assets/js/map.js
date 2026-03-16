@@ -108,18 +108,34 @@ function initMap() {
     map.on('load', loadDataAndAddLayers);
 }
 
+function applyMetadataLabels() {
+    const year = getMeta('secto_year');
+    document.querySelectorAll('.filter-label').forEach(el => {
+        el.textContent = `Sectorisation (${year}) :`;
+    });
+    document.querySelectorAll('[data-label="brevet-year"]').forEach(el => {
+        el.textContent = `Brevet ${getMeta('brevet_session')}`;
+    });
+    document.querySelectorAll('[data-label="results-year"]').forEach(el => {
+        el.textContent = `Résultats au Brevet et au Baccalauréat ${getMeta('bac_annee')}`;
+    });
+}
+
 // Load GeoJSON data and add layers
 async function loadDataAndAddLayers() {
     try {
-        const [sectorsRes, schoolsRes, lyceeAffectRes] = await Promise.all([
+        const [sectorsRes, schoolsRes, lyceeAffectRes, metaRes] = await Promise.all([
             fetch('data/colleges_sectors.geojson'),
             fetch('data/schools_data.json'),
-            fetch('data/lycee_affectation.json')
+            fetch('data/lycee_affectation.json'),
+            fetch('data/metadata.json').catch(() => null)
         ]);
 
         sectorsData = await sectorsRes.json();
         schoolsData = await schoolsRes.json();
         lyceeAffectation = await lyceeAffectRes.json();
+        if (metaRes) siteMetadata = await metaRes.json().catch(() => null);
+        applyMetadataLabels();
 
         // Compute and inject sector colors at runtime
         computeSectorColors(sectorsData, schoolsData);
@@ -346,7 +362,7 @@ function setupClickHandlers() {
             // Create popup for each school
             const popup = new maplibregl.Popup({ closeOnClick: false })
                 .setLngLat([etab.lng, etab.lat])
-                .setHTML(infoCol(etab.nom, etab.adresse, etab.code_postal, etab.nature_uai_libe, etab.txreussite, etab.txmention))
+                .setHTML(infoCol(etab.nom, etab.adresse, etab.code_postal, etab.nature_uai_libe, etab.txreussite, etab.txmention, etab.brevet_session))
                 .addTo(map);
 
             activePopups.push(popup);
@@ -372,7 +388,7 @@ function setupClickHandlers() {
 
         const popup = new maplibregl.Popup()
             .setLngLat(coords)
-            .setHTML(infoCol(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention))
+            .setHTML(infoCol(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention, school.brevet_session))
             .addTo(map);
 
         activePopups.push(popup);
@@ -397,7 +413,7 @@ function setupClickHandlers() {
 
             const popup = new maplibregl.Popup()
                 .setLngLat(coords)
-                .setHTML(infoLyc(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention))
+                .setHTML(infoLyc(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention, school.bac_annee))
                 .addTo(map);
 
             activePopups.push(popup);
