@@ -59,7 +59,9 @@ function popupRates(txreu, txmention, examLabel, year) {
         return '<hr style="margin:6px 0">' +
             '<p style="margin:4px 0 0;color:#bbb;font-size:11px">R\u00e9sultats ' + examLabel + ' non disponibles</p>';
     }
-    const yearStr = year != null ? (' ' + year) : '';
+    const resolvedYear = year != null ? year
+        : (examLabel === 'bac' ? getMeta('bac_annee') : getMeta('brevet_session'));
+    const yearStr = resolvedYear != null ? (' ' + resolvedYear) : '';
     return '<hr style="margin:6px 0">' +
         '<div style="display:flex;gap:12px">' +
         '<span>R\u00e9ussite\u00a0<b>' + formatRate(txreu) + '</b></span>' +

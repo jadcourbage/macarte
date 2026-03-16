@@ -316,7 +316,9 @@ function listCardHtml(school, borderColor, examLabel, distance, uai) {
     const distHtml = distance != null
         ? ` <span class="list-card-dist">(${formatDist(distance)})</span>` : '';
     const hasResults = school.txreussite != null;
-    const examYear = (examLabel === 'bac' ? school.bac_annee : school.brevet_session) || '';
+    const examYear = (examLabel === 'bac' ? school.bac_annee : school.brevet_session)
+        || (examLabel === 'bac' ? getMeta('bac_annee') : getMeta('brevet_session'))
+        || '';
     const resultsHtml = hasResults
         ? `<div class="list-card-rates">
              <span>R\u00e9ussite&#160;<b>${formatRate(school.txreussite)}</b></span>
