@@ -299,7 +299,7 @@ function renderAdvancedMarkers(results) {
         const el = createCircleMarker(color);
         const isCollege = school.nature_uai === COLLEGE_UAI_CODE;
         const popupHtml = isCollege
-            ? infoCol(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention, school.brevet_session)
+            ? infoCol(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention, school.brevet_session, school.ips, school.ips_rentree)
             : infoLyc(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention, school.bac_annee);
         attachMarkerPopup(el, [school.lng, school.lat], popupHtml);
         const marker = new maplibregl.Marker({ element: el })

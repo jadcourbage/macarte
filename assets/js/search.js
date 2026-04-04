@@ -166,7 +166,7 @@ function renderCollegesMode(sector, lng, lat) {
 
                     const popup = new maplibregl.Popup({ closeOnClick: false })
                         .setLngLat([etab.lng, etab.lat])
-                        .setHTML(infoColPath(etab.nom, etab.adresse, etab.code_postal, etab.nature_uai_libe, etab.txreussite, etab.txmention, time, length, etab.brevet_session))
+                        .setHTML(infoColPath(etab.nom, etab.adresse, etab.code_postal, etab.nature_uai_libe, etab.txreussite, etab.txmention, time, length, etab.brevet_session, etab.ips, etab.ips_rentree))
                         .addTo(map);
                     activePopups.push(popup);
                     resolve();
@@ -175,7 +175,7 @@ function renderCollegesMode(sector, lng, lat) {
                     routeBounds.extend([etab.lng, etab.lat]);
                     const popup = new maplibregl.Popup({ closeOnClick: false })
                         .setLngLat([etab.lng, etab.lat])
-                        .setHTML(infoCol(etab.nom, etab.adresse, etab.code_postal, etab.nature_uai_libe, etab.txreussite, etab.txmention, etab.brevet_session))
+                        .setHTML(infoCol(etab.nom, etab.adresse, etab.code_postal, etab.nature_uai_libe, etab.txreussite, etab.txmention, etab.brevet_session, etab.ips, etab.ips_rentree))
                         .addTo(map);
                     activePopups.push(popup);
                     resolve();
@@ -227,7 +227,7 @@ function renderMarkersMode(sector, mode) {
             collegeCoordKeys.add(`${school.lng},${school.lat}`);
             const el = createCircleMarker(COLORS_AFFECTATION.college);
             attachMarkerPopup(el, [school.lng, school.lat],
-                infoCol(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention, school.brevet_session));
+                infoCol(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention, school.brevet_session, school.ips, school.ips_rentree));
             const marker = new maplibregl.Marker({ element: el })
                 .setLngLat([school.lng, school.lat])
                 .addTo(map);
@@ -347,11 +347,14 @@ function listCardHtml(school, borderColor, examLabel, distance, uai) {
              <span>Mentions&#160;<b>${formatRate(school.txmention)}</b></span>
            </div>
            <p class="list-card-exam-label">R\u00e9sultats ${escapeHtml(examLabel)} ${examYear}</p>` : '';
+    const ipsHtml = school.ips != null
+        ? `<p class="list-card-exam-label">IPS\u00a0(${escapeHtml(String(school.ips_rentree || ''))})\u00a0:\u00a0${Math.round(school.ips)}</p>`
+        : '';
     return `<div class="list-card" style="${borderStyle}"${coordAttrs}${uaiAttr}>
       <p class="list-card-name">${escapeHtml(school.nom)}${distHtml}</p>
       <p class="list-card-type">${escapeHtml(formatSchoolType(school.nature_uai_libe))}</p>
       <p class="list-card-address">${escapeHtml(school.adresse)}, ${escapeHtml(school.code_postal)} Paris</p>
-      ${resultsHtml}
+      ${resultsHtml}${ipsHtml}
     </div>`;
 }
 
@@ -426,7 +429,7 @@ function placeSelectedSchoolMarker(uai, lng, lat) {
     const isCollege = school.nature_uai === 340;
     const el = createPinMarker('school');
     const html = isCollege
-        ? infoCol(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention, school.brevet_session)
+        ? infoCol(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention, school.brevet_session, school.ips, school.ips_rentree)
         : infoLyc(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention, school.bac_annee);
     const popup = new maplibregl.Popup({ closeOnClick: false, offset: 38 })
         .setHTML(html);
