@@ -341,20 +341,21 @@ function listCardHtml(school, borderColor, examLabel, distance, uai) {
     const examYear = (examLabel === 'bac' ? school.bac_annee : school.brevet_session)
         || (examLabel === 'bac' ? getMeta('bac_annee') : getMeta('brevet_session'))
         || '';
+    const ipsHtml = school.ips != null
+        ? `<p style="margin:2px 0 0;font-size:11px"><span class="list-card-exam-label">IPS\u00a0(${escapeHtml(String(school.ips_rentree || ''))})\u00a0:</span> <b>${Math.round(school.ips)}</b></p>`
+        : '';
     const resultsHtml = hasResults
         ? `<div class="list-card-rates">
              <span>R\u00e9ussite&#160;<b>${formatRate(school.txreussite)}</b></span>
              <span>Mentions&#160;<b>${formatRate(school.txmention)}</b></span>
            </div>
-           <p class="list-card-exam-label">R\u00e9sultats ${escapeHtml(examLabel)} ${examYear}</p>` : '';
-    const ipsHtml = school.ips != null
-        ? `<p class="list-card-exam-label">IPS\u00a0(${escapeHtml(String(school.ips_rentree || ''))})\u00a0:\u00a0${Math.round(school.ips)}</p>`
-        : '';
+           <p class="list-card-exam-label">R\u00e9sultats ${escapeHtml(examLabel)} ${examYear}</p>
+           ${ipsHtml}` : '';
     return `<div class="list-card" style="${borderStyle}"${coordAttrs}${uaiAttr}>
       <p class="list-card-name">${escapeHtml(school.nom)}${distHtml}</p>
       <p class="list-card-type">${escapeHtml(formatSchoolType(school.nature_uai_libe))}</p>
       <p class="list-card-address">${escapeHtml(school.adresse)}, ${escapeHtml(school.code_postal)} Paris</p>
-      ${resultsHtml}${ipsHtml}
+      ${resultsHtml}
     </div>`;
 }
 

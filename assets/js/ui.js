@@ -54,7 +54,7 @@ function formatSchoolType(type) {
     return SCHOOL_TYPE_LABELS[type] || type;
 }
 
-function popupRates(txreu, txmention, examLabel, year) {
+function popupRates(txreu, txmention, examLabel, year, ips, ipsRentree) {
     if (txreu == null) {
         return '<hr style="margin:6px 0">' +
             '<p style="margin:4px 0 0;color:#bbb;font-size:11px">R\u00e9sultats ' + examLabel + ' non disponibles</p>';
@@ -62,12 +62,16 @@ function popupRates(txreu, txmention, examLabel, year) {
     const resolvedYear = year != null ? year
         : (examLabel === 'bac' ? getMeta('bac_annee') : getMeta('brevet_session'));
     const yearStr = resolvedYear != null ? (' ' + resolvedYear) : '';
+    const ipsLine = ips != null
+        ? '<p style="margin:4px 0 0;font-size:11px"><span style="color:#999">IPS\u00a0(' + escapeHtml(String(ipsRentree || '')) + ')\u00a0:</span> <b>' + Math.round(ips) + '</b></p>'
+        : '';
     return '<hr style="margin:6px 0">' +
         '<div style="display:flex;gap:12px">' +
         '<span>R\u00e9ussite\u00a0<b>' + formatRate(txreu) + '</b></span>' +
         '<span>Mentions\u00a0<b>' + formatRate(txmention) + '</b></span>' +
         '</div>' +
-        '<p style="margin:4px 0 0;color:#999;font-size:11px">R\u00e9sultats ' + examLabel + yearStr + '</p>';
+        '<p style="margin:4px 0 0;color:#999;font-size:11px">R\u00e9sultats ' + examLabel + yearStr + '</p>' +
+        ipsLine;
 }
 
 function popupSchoolHeader(nom, type) {
@@ -77,28 +81,20 @@ function popupSchoolHeader(nom, type) {
 
 // Generate HTML content for college popup
 function infoCol(nom, adresse, codepostal, type, txreu, txmention, brevetSession, ips, ipsRentree) {
-    const ipsHtml = ips != null
-        ? '<p style="margin:2px 0 0;color:#999;font-size:11px">IPS\u00a0(' + escapeHtml(String(ipsRentree || '')) + ')\u00a0:\u00a0' + Math.round(ips) + '</p>'
-        : '';
     return popupSchoolHeader(nom, type) +
         '<p style="margin:0 0 4px;color:#555">' + escapeHtml(adresse) + '<br>' + escapeHtml(codepostal) + ' PARIS</p>' +
-        popupRates(txreu, txmention, 'brevet', brevetSession) +
-        ipsHtml;
+        popupRates(txreu, txmention, 'brevet', brevetSession, ips, ipsRentree);
 }
 
 // Generate HTML content for college popup with walking distance
 function infoColPath(nom, adresse, codepostal, type, txreu, txmention, time, distance, brevetSession, ips, ipsRentree) {
-    const ipsHtml = ips != null
-        ? '<p style="margin:2px 0 0;color:#999;font-size:11px">IPS\u00a0(' + escapeHtml(String(ipsRentree || '')) + ')\u00a0:\u00a0' + Math.round(ips) + '</p>'
-        : '';
     return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">' +
         '<img src="./assets/img/walk.png" height="16" width="16">' +
         '<b>' + escapeHtml(String(distance)) + ' m\u00a0/\u00a0' + escapeHtml(String(time)) + ' min</b>' +
         '</div>' +
         popupSchoolHeader(nom, type) +
         '<p style="margin:0 0 4px;color:#555">' + escapeHtml(adresse) + '<br>' + escapeHtml(codepostal) + ' PARIS</p>' +
-        popupRates(txreu, txmention, 'brevet', brevetSession) +
-        ipsHtml;
+        popupRates(txreu, txmention, 'brevet', brevetSession, ips, ipsRentree);
 }
 
 // Generate HTML content for lycée popup
