@@ -36,10 +36,11 @@ function isMobile() {
 
 // Colors for affectation mode markers
 const COLORS_AFFECTATION = {
-    college: '#4A7FB5',
-    lycee1:  '#C23B22',
-    lycee2:  '#4CAF50',
-    lycee3:  '#F5C518'
+    college:     '#4A7FB5',
+    lycee1:      '#C23B22',
+    lycee2:      '#4CAF50',
+    lycee3:      '#F5C518',
+    horsSecteur: '#7B2D8B'
 };
 
 // Colors for school markers

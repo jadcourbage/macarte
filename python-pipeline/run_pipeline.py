@@ -397,7 +397,7 @@ def merge_bac_results(schools):
     return schools
 
 
-ELITE_LYCEE_UAIS = ['0750654D', '0750655E', '0750685M']
+HORS_SECTEUR_UAIS = ['0750654D', '0750655E', '0750685M']
 
 
 def get_lycee_affectation():
@@ -442,9 +442,12 @@ def get_lycee_affectation():
         if lycee_uai not in affectation[college_uai][secteur]:
             affectation[college_uai][secteur].append(lycee_uai)
 
-    # Prepend elite UAIs to every college's secteur 1 list (deduped)
+    # Remove hors-secteur lycées from all regular sector assignments
     for sectors in affectation.values():
-        sectors["1"] = list(dict.fromkeys(ELITE_LYCEE_UAIS + sectors["1"]))
+        for s in ('1', '2', '3'):
+            sectors[s] = [u for u in sectors[s] if u not in HORS_SECTEUR_UAIS]
+
+    affectation['hors_secteur'] = HORS_SECTEUR_UAIS
 
     print(f"Fetched affectation for {len(affectation)} colleges")
     return affectation

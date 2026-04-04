@@ -190,7 +190,7 @@ function renderCollegesMode(sector, lng, lat) {
 }
 
 function getAffectationData(sector) {
-    if (!sector) return { colleges: [], lyceesBySecteur: { '1': [], '2': [], '3': [] } };
+    if (!sector) return { colleges: [], lyceesBySecteur: { '1': [], '2': [], '3': [] }, horsSecteur: [] };
     const uais = typeof sector.properties.uais === 'string'
         ? JSON.parse(sector.properties.uais) : sector.properties.uais;
     const colleges = uais.map(uai => schoolsData[uai]).filter(Boolean);
@@ -204,7 +204,8 @@ function getAffectationData(sector) {
             });
         });
     });
-    return { colleges, lyceesBySecteur };
+    const horsSecteur = lyceeAffectation.hors_secteur || [];
+    return { colleges, lyceesBySecteur, horsSecteur };
 }
 
 function renderMarkersMode(sector, mode) {
@@ -213,7 +214,7 @@ function renderMarkersMode(sector, mode) {
         return;
     }
 
-    const { colleges, lyceesBySecteur } = getAffectationData(sector);
+    const { colleges, lyceesBySecteur, horsSecteur } = getAffectationData(sector);
 
     const bounds = new maplibregl.LngLatBounds();
     bounds.extend([lastSearch.lng, lastSearch.lat]);
@@ -255,6 +256,19 @@ function renderMarkersMode(sector, mode) {
             activeMarkers.push(marker);
             bounds.extend([school.lng, school.lat]);
         });
+    });
+
+    horsSecteur.forEach(uai => {
+        const school = schoolsData[uai];
+        if (!school || !school.lng || !school.lat) return;
+        const el = createCircleMarker(COLORS_AFFECTATION.horsSecteur);
+        attachMarkerPopup(el, [school.lng, school.lat],
+            infoLyc(school.nom, school.adresse, school.code_postal, school.nature_uai_libe, school.txreussite, school.txmention, school.bac_annee));
+        const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([school.lng, school.lat])
+            .addTo(map);
+        activeMarkers.push(marker);
+        bounds.extend([school.lng, school.lat]);
     });
 
     showLegend(mode);
@@ -373,6 +387,18 @@ function buildListHtml(data, mode) {
                 html += listCardHtml(school, borderColor, 'brevet', isFinite(d) ? d : null, uai);
             });
         }
+    }
+
+    if ((mode === 'both' || mode === 'lycees') && data.horsSecteur && data.horsSecteur.length > 0) {
+        html += `<div class="list-section-header" style="border-left: 4px solid ${COLORS_AFFECTATION.horsSecteur};">Lyc\u00e9es \u2014 hors secteur</div>`;
+        [...data.horsSecteur]
+            .sort((a, b) => distFrom(schoolsData[a]) - distFrom(schoolsData[b]))
+            .forEach(uai => {
+                const school = schoolsData[uai];
+                if (!school) return;
+                const d = distFrom(school);
+                html += listCardHtml(school, COLORS_AFFECTATION.horsSecteur, 'bac', isFinite(d) ? d : null, uai);
+            });
     }
 
     if (mode === 'both' || mode === 'lycees') {
