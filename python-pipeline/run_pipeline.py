@@ -12,9 +12,9 @@ from unidecode import unidecode
 
 # === Data vintage — NOTE: mirror in check_data_updates.py CURRENT_* constants ===
 SECTO_YEAR     = "2026/2027"
-BREVET_SESSION = 2024
+BREVET_SESSION = 2025
 IPS_RENTREE    = "2024-2025"
-BAC_ANNEE      = 2024
+BAC_ANNEE      = 2025
 
 
 def get_paris_data_geojson(dataset, id_projet=None):
